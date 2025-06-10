@@ -8,16 +8,505 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="stylesheet" href="./resources/ol.css">
         <link rel="stylesheet" href="resources/fontawesome-all.min.css">
-        <link rel="stylesheet" href="./resources/ol-layerswitcher.css">
         <link rel="stylesheet" href="./resources/qgis2web.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+        
         <style>
+        /* Base styles from index.html */
         html, body {
-            background-color: #ffffff;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
         }
+
+        /* Modern Control Panel Base Styles from index.html */
+        .modern-panel {
+            position: fixed;
+            z-index: 2000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 320px;
+            max-width: 384px;
+        }
+
+        /* Layer Control Panel */
+        .layer-control-panel {
+            top: 24px;
+            left: 24px;
+        }
+
+        .layer-control-panel.collapsed {
+            transform: translateX(calc(-100% + 48px));
+        }
+
+        /* Legend Panel */
+        .legend-panel {
+            top: 24px;
+            right: 24px;
+        }
+
+        .legend-panel.collapsed {
+            transform: translateX(calc(100% - 48px));
+        }
+
+        /* Map Info Panel */
+        .map-info-panel {
+            top: auto;
+            bottom: 24px;
+            right: 24px;
+            max-width: 320px;
+        }
+
+        .map-info-panel.collapsed {
+            transform: translateX(calc(100% - 48px));
+        }
+
+        /* Panel Headers */
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .panel-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .panel-icon {
+            padding: 8px;
+            border-radius: 12px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .panel-icon.layers { 
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
+        }
+        .panel-icon.legend { 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+        }
+        .panel-icon.info { 
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); 
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .panel-toggle {
+            padding: 8px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            z-index: 3100; /* High z-index for clickability */
+        }
+
+        .panel-toggle:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        /* Toggle button when collapsed */
+        .collapsed .panel-toggle {
+            position: absolute;
+            right: -48px; /* Increased for better click area */
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 3100; /* Higher z-index to ensure clickability */
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            border-radius: 12px;
+        }
+
+        .legend-panel.collapsed .panel-toggle,
+        .map-info-panel.collapsed .panel-toggle {
+            left: -48px; /* Adjusted for legend and info panels */
+            right: auto;
+        }
+
+        /* Ensure panels don’t interfere with clicks when collapsed */
+        .modern-panel.collapsed {
+            overflow: visible; /* Allow toggle button to be accessible */
+        }
+
+        /* Hover effect for better feedback */
+        .panel-toggle:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+            transform: translateY(-50%) scale(1.05); /* Slight scale for feedback */
+        }
+
+        /* Panel Content */
+        .panel-content {
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .collapsed .panel-content {
+            display: none;
+        }
+
+        /* Section Styles */
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* Basemap Selector */
+        .basemap-section {
+            margin-bottom: 24px;
+        }
+
+        .basemap-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            transition: all 0.2s ease;
+        }
+
+        .basemap-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Layer Items */
+        .layer-section {
+            margin-bottom: 24px;
+        }
+
+        .layer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .layer-item {
+            padding: 16px;
+            background: rgba(248, 250, 252, 0.5);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .layer-item:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .layer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .layer-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .layer-icon {
+            color: #64748b;
+            width: 16px;
+            height: 16px;
+        }
+
+        .layer-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .visibility-toggle {
+            padding: 6px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .visibility-toggle.visible {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .visibility-toggle.hidden {
+            background: #e2e8f0;
+            color: #94a3b8;
+        }
+
+        .visibility-toggle:hover.visible {
+            background: #bfdbfe;
+        }
+
+        .visibility-toggle:hover.hidden {
+            background: #cbd5e1;
+        }
+
+        /* Opacity Controls */
+        .opacity-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .opacity-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            min-width: 60px;
+        }
+
+        .opacity-slider {
+            flex: 1;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .opacity-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #3b82f6;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .opacity-slider::-webkit-slider-thumb:hover {
+            background: #2563eb;
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .opacity-value {
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            min-width: 35px;
+        }
+
+        /* Legend Items */
+        .legend-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 384px;
+            overflow-y: auto;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .legend-item:hover {
+            background: #f8fafc;
+        }
+
+        .legend-symbol {
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            border: 2px solid;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .legend-label {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .legend-toggle {
+            padding: 6px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .legend-toggle.visible {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .legend-toggle.hidden {
+            background: #e2e8f0;
+            color: #94a3b8;
+        }
+
+        .legend-toggle:hover.visible {
+            background: #bbf7d0;
+        }
+
+        .legend-toggle:hover.hidden {
+            background: #cbd5e1;
+        }
+
+        /* Info Panel */
+        .info-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .info-value {
+            color: #1e293b;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Custom Scrollbar */
+        .layer-list::-webkit-scrollbar,
+        .legend-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .layer-list::-webkit-scrollbar-track,
+        .legend-list::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .layer-list::-webkit-scrollbar-thumb,
+        .legend-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .layer-list::-webkit-scrollbar-thumb:hover,
+        .legend-list::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .layer-control-panel,
+            .legend-panel,
+            .map-info-panel {
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                max-width: none;
+                min-width: auto;
+                z-index: 3000;
+            }
+            
+            .legend-panel {
+                top: auto;
+                bottom: 100px; /* Adjust to leave space for info panel */
+            }
+            
+            .map-info-panel {
+                top: auto;
+                bottom: 10px;
+            }
+            
+            .collapsed .panel-toggle {
+                z-index: 3100; /* High z-index for mobile clickability */
+            }
+        }
+        
+        /* Default OpenLayers Control Styles (simplified from index (1).html, if needed) */
         .ol-control > * {
-            background-color: #f8f8f8!important;
-            color: #444444!important;
-            border-radius: 0px;
+            background-color: rgba(255, 255, 255, 0.9)!important;
+            color: #1e293b!important;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        .ol-control {
+            background-color: transparent !important;
+            padding: 4px !important;
         }
         .ol-attribution a, .gcd-gl-input::placeholder, .search-layer-input-search::placeholder {
             color: #444444!important;
@@ -27,10 +516,6 @@
         }
         .ol-control > *:focus, .ol-control >*:hover {
             background-color: rgba(248, 248, 248, 0.7)!important;
-        } 
-        .ol-control {
-            background-color: rgba(255,255,255,.4) !important;
-            padding: 2px !important;
         } 
         </style>
 
@@ -42,11 +527,8 @@
             margin: 0;
         }
         </style>
-        <title></title>
+        <title>SITAU - Peta Interaktif Desa Bawu</title>
     
-<link rel="stylesheet" href="resources/ol-layerswitcher.css" />
-<script src="resources/ol-layerswitcher.js"></script>
-
 </head>
     <body>
         <div id="map">
@@ -55,21 +537,590 @@
                 <div id="popup-content"></div>
             </div>
         </div>
+
+        <div class="modern-panel layer-control-panel" id="layerControlPanel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <div class="panel-icon layers">
+                        <i data-lucide="layers" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <h3 class="panel-title">Kontrol Layer</h3>
+                </div>
+                <button class="panel-toggle" id="layerControlToggle">
+                    <i data-lucide="chevron-left" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
+            
+            <div class="panel-content">
+                <div class="basemap-section">
+                    <div class="section-label">
+                        <i data-lucide="map" style="width: 16px; height: 16px;"></i>
+                        Peta Dasar
+                    </div>
+                    <select class="basemap-select" id="basemapSelect">
+                        <option value="osm">OpenStreetMap</option>
+                        <option value="satellite">Citra Satelit</option>
+                        <option value="terrain">Terrain</option>
+                        <option value="topo">Topografi</option>
+                    </select>
+                </div>
+
+                <div class="layer-section">
+                    <div class="section-title">
+                        <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+                        Layer Data Pertanahan
+                    </div>
+                    
+                    <div class="layer-list">
+                        <div class="layer-item" data-layer="bidangTanah">
+                            <div class="layer-header">
+                                <div class="layer-info">
+                                    <i data-lucide="map-pin" class="layer-icon"></i>
+                                    <span class="layer-name">Bidang Tanah</span>
+                                </div>
+                                <button class="visibility-toggle visible" data-layer="bidangTanah">
+                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                </button>
+                            </div>
+                            <div class="opacity-control">
+                                <span class="opacity-label">Opacity:</span>
+                                <input type="range" class="opacity-slider" min="0" max="100" value="100" data-layer="bidangTanah">
+                                <span class="opacity-value">100%</span>
+                            </div>
+                        </div>
+
+                        <div class="layer-item" data-layer="hak">
+                            <div class="layer-header">
+                                <div class="layer-info">
+                                    <i data-lucide="home" class="layer-icon"></i>
+                                    <span class="layer-name">Hak Kepemilikan</span>
+                                </div>
+                                <button class="visibility-toggle visible" data-layer="hak">
+                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                </button>
+                            </div>
+                            <div class="opacity-control">
+                                <span class="opacity-label">Opacity:</span>
+                                <input type="range" class="opacity-slider" min="0" max="100" value="100" data-layer="hak">
+                                <span class="opacity-value">100%</span>
+                            </div>
+                        </div>
+
+                        <div class="layer-item" data-layer="pl">
+                            <div class="layer-header">
+                                <div class="layer-info">
+                                    <i data-lucide="tree-pine" class="layer-icon"></i>
+                                    <span class="layer-name">Penggunaan Lahan</span>
+                                </div>
+                                <button class="visibility-toggle visible" data-layer="pl">
+                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                </button>
+                            </div>
+                            <div class="opacity-control">
+                                <span class="opacity-label">Opacity:</span>
+                                <input type="range" class="opacity-slider" min="0" max="100" value="100" data-layer="pl">
+                                <span class="opacity-value">100%</span>
+                            </div>
+                        </div>
+
+                        <div class="layer-item" data-layer="znt">
+                            <div class="layer-header">
+                                <div class="layer-info">
+                                    <i data-lucide="building" class="layer-icon"></i>
+                                    <span class="layer-name">Zona Nilai Tanah</span>
+                                </div>
+                                <button class="visibility-toggle visible" data-layer="znt">
+                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                </button>
+                            </div>
+                            <div class="opacity-control">
+                                <span class="opacity-label">Opacity:</span>
+                                <input type="range" class="opacity-slider" min="0" max="100" value="100" data-layer="znt">
+                                <span class="opacity-value">100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modern-panel legend-panel" id="legendPanel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <div class="panel-icon legend">
+                        <i data-lucide="info" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <h3 class="panel-title">Layer Peta</h3>
+                </div>
+                <button class="panel-toggle" id="legendToggle">
+                    <i data-lucide="chevron-right" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
+            
+            <div class="panel-content">
+                <div class="legend-list">
+                    <div class="legend-item" data-layer="bidangTanah">
+                        <div class="legend-symbol" style="background-color: #ff6b6b80; border-color: #ff6b6b;"></div>
+                        <span class="legend-label">Bidang Tanah</span>
+                        <button class="legend-toggle visible" data-layer="bidangTanah">
+                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </div>
+
+                    <div class="legend-item" data-layer="hak">
+                        <div class="legend-symbol" style="background-color: #4ecdc480; border-color: #4ecdc4;"></div>
+                        <span class="legend-label">Hak Kepemilikan</span>
+                        <button class="legend-toggle visible" data-layer="hak">
+                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </div>
+
+                    <div class="legend-item" data-layer="pl">
+                        <div class="legend-symbol" style="background-color: #45b7d180; border-color: #45b7d1;"></div>
+                        <span class="legend-label">Penggunaan Lahan</span>
+                        <button class="legend-toggle visible" data-layer="pl">
+                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </div>
+
+                    <div class="legend-item" data-layer="znt">
+                        <div class="legend-symbol" style="background-color: #f9ca2480; border-color: #f9ca24;"></div>
+                        <span class="legend-label">Zona Nilai Tanah</span>
+                        <button class="legend-toggle visible" data-layer="znt">
+                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modern-panel map-info-panel" id="mapInfoPanel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <div class="panel-icon info">
+                        <i data-lucide="info" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <h4 class="panel-title">Informasi Peta</h4>
+                </div>
+                <button class="panel-toggle" id="mapInfoToggle">
+                    <i data-lucide="chevron-right" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
+            
+            <div class="panel-content">
+                <div class="info-content">
+                    <div class="info-row">
+                        <span class="info-label">Lokasi:</span>
+                        <span class="info-value">Desa Bawu, Kemusu, Boyolali</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Koordinat:</span>
+                        <span class="info-value" id="mouseCoords">-7.5234°, 110.7234°</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Skala:</span>
+                        <span class="info-value" id="mapScale">1:10,000</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Proyeksi:</span>
+                        <span class="info-value">EPSG:3857</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script src="resources/qgis2web_expressions.js"></script>
         <script src="./resources/functions.js"></script>
         <script src="./resources/ol.js"></script>
-        <script src="./resources/ol-layerswitcher.js"></script>
         <script src="layers/BidangTanah_Bawu_1.js"></script><script src="layers/Hak_Bawu_2.js"></script><script src="layers/PL_Bawu_3.js"></script><script src="layers/ZNT_Bawu_4.js"></script>
         <script src="styles/BidangTanah_Bawu_1_style.js"></script><script src="styles/Hak_Bawu_2_style.js"></script><script src="styles/PL_Bawu_3_style.js"></script><script src="styles/ZNT_Bawu_4_style.js"></script>
         <script src="./layers/layers.js" type="text/javascript"></script> 
         <script src="./resources/Autolinker.min.js"></script>
-        <script src="./resources/qgis2web.js">
-var layerSwitcher = new ol.control.LayerSwitcher({
-    tipLabel: 'Legenda dan Layer', // Tooltip label
-    groupSelectStyle: 'children' // 'children' untuk kontrol per layer
-});
-map.addControl(layerSwitcher);
+        <script src="./resources/qgis2web.js"></script>
 
-</script>
+        <script>
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+
+        // Wait for map to be initialized
+        let mapInitialized = false;
+        let layerReferences = {};
+
+        // Layer state management
+        const layerState = {
+            bidangTanah: { visible: true, opacity: 100 },
+            hak: { visible: true, opacity: 100 },
+            pl: { visible: true, opacity: 100 },
+            znt: { visible: true, opacity: 100 }
+        };
+
+        // Function to wait for map initialization
+        function waitForMap() {
+            if (typeof map !== 'undefined' && map && typeof map.on === 'function') {
+                mapInitialized = true;
+                setupLayerReferences();
+                initializeModernControls();
+            } else {
+                setTimeout(waitForMap, 100);
+            }
+        }
+
+        // Setup layer references
+        function setupLayerReferences() {
+            if (typeof lyr_BidangTanah_Bawu_1 !== 'undefined') {
+                layerReferences.bidangTanah = lyr_BidangTanah_Bawu_1;
+            }
+            if (typeof lyr_Hak_Bawu_2 !== 'undefined') {
+                layerReferences.hak = lyr_Hak_Bawu_2;
+            }
+            if (typeof lyr_PL_Bawu_3 !== 'undefined') {
+                layerReferences.pl = lyr_PL_Bawu_3;
+            }
+            if (typeof lyr_ZNT_Bawu_4 !== 'undefined') {
+                layerReferences.znt = lyr_ZNT_Bawu_4;
+            }
+        }
+
+        // Initialize modern controls
+        function initializeModernControls() {
+            // Panel toggles
+            setupPanelToggles();
+            
+            // Basemap switching
+            setupBasemapControl();
+            
+            // Layer visibility controls
+            setupLayerVisibilityControls();
+            
+            // Opacity controls
+            setupOpacityControls();
+            
+            // Legend controls
+            setupLegendControls();
+            
+            // Coordinate tracking
+            setupCoordinateTracking();
+            
+            // Scale tracking
+            setupScaleTracking();
+        }
+
+        // Setup panel toggles
+        function setupPanelToggles() {
+            const layerControlPanel = document.getElementById('layerControlPanel');
+            const layerControlToggle = document.getElementById('layerControlToggle');
+            const legendPanel = document.getElementById('legendPanel');
+            const legendToggle = document.getElementById('legendToggle');
+            const mapInfoPanel = document.getElementById('mapInfoPanel');
+            const mapInfoToggle = document.getElementById('mapInfoToggle');
+
+            // Layer Control Panel Toggle
+            if (layerControlToggle && layerControlPanel) {
+                layerControlToggle.onclick = function() {
+                    layerControlPanel.classList.toggle('collapsed');
+                    const icon = this.querySelector('i');
+                    
+                    if (layerControlPanel.classList.contains('collapsed')) {
+                        icon.setAttribute('data-lucide', 'chevron-right');
+                    } else {
+                        icon.setAttribute('data-lucide', 'chevron-left');
+                    }
+                    
+                    lucide.createIcons();
+                };
+            }
+
+            // Legend Panel Toggle
+            if (legendToggle && legendPanel) {
+                legendToggle.onclick = function() {
+                    legendPanel.classList.toggle('collapsed');
+                    const icon = this.querySelector('i');
+                    
+                    if (legendPanel.classList.contains('collapsed')) {
+                        icon.setAttribute('data-lucide', 'chevron-left');
+                    } else {
+                        icon.setAttribute('data-lucide', 'chevron-right');
+                    }
+                    
+                    lucide.createIcons();
+                };
+            }
+
+            // Map Info Panel Toggle
+            if (mapInfoToggle && mapInfoPanel) {
+                mapInfoToggle.onclick = function() {
+                    mapInfoPanel.classList.toggle('collapsed');
+                    const icon = this.querySelector('i');
+                    
+                    if (mapInfoPanel.classList.contains('collapsed')) {
+                        icon.setAttribute('data-lucide', 'chevron-left');
+                    } else {
+                        icon.setAttribute('data-lucide', 'chevron-right');
+                    }
+                    
+                    lucide.createIcons();
+                };
+            }
+        }
+
+        // Setup basemap control
+        function setupBasemapControl() {
+            const basemapSelect = document.getElementById('basemapSelect');
+            if (basemapSelect) { // Added check for basemapSelect
+                basemapSelect.addEventListener('change', function() {
+                    switchBasemap(this.value);
+                });
+            }
+        }
+
+        // Setup layer visibility controls
+        function setupLayerVisibilityControls() {
+            const visibilityToggles = document.querySelectorAll('.visibility-toggle');
+            
+            visibilityToggles.forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const layerKey = this.getAttribute('data-layer');
+                    if (layerKey && layerState[layerKey]) {
+                        const isVisible = !layerState[layerKey].visible;
+                        
+                        // Toggle visibility
+                        layerState[layerKey].visible = isVisible;
+                        toggleLayerVisibility(layerKey, isVisible);
+                        
+                        // Update button appearance
+                        updateVisibilityButton(this, isVisible);
+                        
+                        // Sync with legend
+                        syncLegendToggle(layerKey, isVisible);
+                    }
+                });
+            });
+        }
+
+        // Setup opacity controls
+        function setupOpacityControls() {
+            const opacitySliders = document.querySelectorAll('.opacity-slider');
+            
+            opacitySliders.forEach(slider => {
+                slider.addEventListener('input', function() {
+                    const layerKey = this.getAttribute('data-layer');
+                    const opacity = parseInt(this.value);
+                    
+                    // Update layer opacity
+                    layerState[layerKey].opacity = opacity;
+                    setLayerOpacity(layerKey, opacity / 100);
+                    
+                    // Update display value
+                    const valueDisplay = this.parentElement.querySelector('.opacity-value');
+                    valueDisplay.textContent = opacity + '%';
+                });
+            });
+        }
+
+        // Setup legend controls
+        function setupLegendControls() {
+            const legendToggles = document.querySelectorAll('.legend-toggle');
+            
+            legendToggles.forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const legendItem = this.closest('.legend-item');
+                    const layerKey = legendItem.getAttribute('data-layer');
+                    
+                    if (layerKey && layerState[layerKey]) {
+                        const isVisible = !layerState[layerKey].visible;
+                        
+                        // Toggle visibility
+                        layerState[layerKey].visible = isVisible;
+                        toggleLayerVisibility(layerKey, isVisible);
+                        
+                        // Update legend button
+                        updateLegendButton(this, isVisible);
+                        
+                        // Sync with layer control
+                        syncVisibilityToggle(layerKey, isVisible);
+                    }
+                });
+            });
+        }
+
+        // Setup coordinate tracking
+        function setupCoordinateTracking() {
+            if (mapInitialized && map && typeof map.on === 'function') { // Added mapInitialized check
+                map.on('pointermove', function(evt) {
+                    const coordinate = ol.proj.toLonLat(evt.coordinate);
+                    const coords = coordinate[1].toFixed(6) + '°, ' + coordinate[0].toFixed(6) + '°';
+                    const coordsElement = document.getElementById('mouseCoords');
+                    if (coordsElement) {
+                        coordsElement.textContent = coords;
+                    }
+                });
+            }
+        }
+
+        // Setup scale tracking
+        function setupScaleTracking() {
+            if (mapInitialized && map && typeof map.getView === 'function') { // Added mapInitialized check
+                map.getView().on('change:resolution', function() {
+                    const resolution = map.getView().getResolution();
+                    const units = map.getView().getProjection().getUnits();
+                    const dpi = 25.4 / 0.28;
+                    const mpu = ol.proj.METERS_PER_UNIT[units];
+                    const scale = resolution * mpu * 39.37 * dpi;
+                    const scaleElement = document.getElementById('mapScale');
+                    if (scaleElement) {
+                        scaleElement.textContent = '1:' + Math.round(scale).toLocaleString();
+                    }
+                });
+            }
+        }
+
+        // Helper functions
+        function updateVisibilityButton(button, isVisible) {
+            const icon = button.querySelector('i');
+            if (icon) {
+                button.classList.remove('visible', 'hidden');
+                button.classList.add(isVisible ? 'visible' : 'hidden');
+                icon.setAttribute('data-lucide', isVisible ? 'eye' : 'eye-off');
+                lucide.createIcons();
+            }
+        }
+
+        function updateLegendButton(button, isVisible) {
+            const icon = button.querySelector('i');
+            if (icon) {
+                button.classList.remove('visible', 'hidden');
+                button.classList.add(isVisible ? 'visible' : 'hidden');
+                icon.setAttribute('data-lucide', isVisible ? 'eye' : 'eye-off');
+                lucide.createIcons();
+            }
+        }
+
+        function syncLegendToggle(layerKey, isVisible) {
+            const legendItem = document.querySelector(`.legend-item[data-layer="${layerKey}"]`);
+            if (legendItem) {
+                const legendToggle = legendItem.querySelector('.legend-toggle');
+                if (legendToggle) { // Added check for legendToggle
+                    updateLegendButton(legendToggle, isVisible);
+                }
+            }
+        }
+
+        function syncVisibilityToggle(layerKey, isVisible) {
+            const visibilityToggle = document.querySelector(`.visibility-toggle[data-layer="${layerKey}"]`);
+            if (visibilityToggle) { // Added check for visibilityToggle
+                updateVisibilityButton(visibilityToggle, isVisible);
+            }
+        }
+
+        // Basemap switching function
+        function switchBasemap(basemapType) {
+            if (!mapInitialized || !map || typeof map.getLayers !== 'function') { // Added mapInitialized check
+                return;
+            }
+            
+            const layers = map.getLayers().getArray();
+            const baseLayer = layers[0];
+            
+            let newBaseLayer;
+            
+            switch(basemapType) {
+                case 'satellite':
+                    newBaseLayer = new ol.layer.Tile({
+                        source: new ol.source.XYZ({
+                            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                            attributions: 'Tiles © Esri'
+                        })
+                    });
+                    break;
+                case 'terrain':
+                    newBaseLayer = new ol.layer.Tile({
+                        source: new ol.source.XYZ({
+                            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}',
+                            attributions: 'Tiles © Esri'
+                        })
+                    });
+                    break;
+                case 'topo':
+                    newBaseLayer = new ol.layer.Tile({
+                        source: new ol.source.XYZ({
+                            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+                            attributions: 'Tiles © Esri'
+                        })
+                    });
+                    break;
+                default:
+                    newBaseLayer = new ol.layer.Tile({
+                        source: new ol.source.OSM()
+                    });
+            }
+            
+            map.getLayers().setAt(0, newBaseLayer);
+        }
+
+        // Layer control functions
+        function toggleLayerVisibility(layerKey, visible) {
+            const layer = layerReferences[layerKey];
+            if (layer && typeof layer.setVisible === 'function') { // Added typeof check
+                layer.setVisible(visible);
+            }
+        }
+
+        function setLayerOpacity(layerKey, opacity) {
+            const layer = layerReferences[layerKey];
+            if (layer && typeof layer.setOpacity === 'function') { // Added typeof check
+                layer.setOpacity(opacity);
+            }
+        }
+
+        // Responsive behavior
+        window.addEventListener('resize', function() {
+            if (window.innerWidth <= 768) {
+                const legendPanel = document.getElementById('legendPanel');
+                const layerControlPanel = document.getElementById('layerControlPanel');
+                const mapInfoPanel = document.getElementById('mapInfoPanel');
+                
+                if (legendPanel && !legendPanel.classList.contains('collapsed')) {
+                    legendPanel.classList.add('collapsed');
+                    const legendToggle = document.getElementById('legendToggle');
+                    const icon = legendToggle.querySelector('i');
+                    icon.setAttribute('data-lucide', 'chevron-left');
+                    lucide.createIcons();
+                }
+                
+                if (layerControlPanel && !layerControlPanel.classList.contains('collapsed')) {
+                    layerControlPanel.classList.add('collapsed');
+                    const layerToggle = document.getElementById('layerControlToggle');
+                    const icon = layerToggle.querySelector('i');
+                    icon.setAttribute('data-lucide', 'chevron-right');
+                    lucide.createIcons();
+                }
+                
+                if (mapInfoPanel && !mapInfoPanel.classList.contains('collapsed')) {
+                    mapInfoPanel.classList.add('collapsed');
+                    const mapInfoToggle = document.getElementById('mapInfoToggle');
+                    const icon = mapInfoToggle.querySelector('i');
+                    icon.setAttribute('data-lucide', 'chevron-left');
+                    lucide.createIcons();
+                }
+            }
+        });
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            waitForMap();
+        });
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', waitForMap);
+        } else {
+            waitForMap();
+        }
+        </script>
     </body>
 </html>
