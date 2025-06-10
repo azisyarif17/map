@@ -1,1096 +1,597 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
-        <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <link rel="stylesheet" href="./resources/ol.css">
-        <link rel="stylesheet" href="resources/fontawesome-all.min.css">
-        <link rel="stylesheet" href="./resources/qgis2web.css">
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-        
-        <style>
-        /* Gaya dasar HTML dan Body dari desain modern */
-        html, body {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            font-family: 'Inter', sans-serif;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITARU - Sistem Informasi Pertanahan Desa Bawu - Home</title>
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
-        /* Gaya Panel Kontrol Modern */
-        .modern-panel {
-            position: fixed;
-            z-index: 2000;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            min-width: 320px;
-            max-width: 384px;
-        }
-
-        /* Panel Kontrol Layer */
-        .layer-control-panel {
-            top: 24px;
-            left: 24px;
-        }
-
-        .layer-control-panel.collapsed {
-            transform: translateX(calc(-100% + 48px));
-        }
-
-        /* Panel Legenda */
-        .legend-panel {
-            top: 24px;
-            right: 24px;
-        }
-
-        .legend-panel.collapsed {
-            transform: translateX(calc(100% - 48px));
-        }
-
-        /* Panel Informasi Peta */
-        .map-info-panel {
-            top: auto;
-            bottom: 24px;
-            right: 24px;
-            max-width: 320px;
-        }
-
-        .map-info-panel.collapsed {
-            transform: translateX(calc(100% - 48px));
-        }
-
-        /* Header Panel */
-        .panel-header {
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background: linear-gradient(135deg, #1B263B 0%, #2E3B55 50%, #415A77 100%);
+            min-height: 100vh;
+            line-height: 1.6;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 24px;
-            border-bottom: 1px solid #e2e8f0;
+            flex-direction: column;
         }
 
-        .panel-title-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-    }
+        main {
+            flex: 1 0 auto;
+        }
 
-        .panel-icon {
-            padding: 8px;
-            border-radius: 12px;
+        /* Gaya Header */
+        header {
+            background: linear-gradient(135deg, #0D1B2A 0%, #1B263B 100%);
             color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .panel-icon.layers { 
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
-        }
-        .panel-icon.legend { 
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
-        }
-        .panel-icon.info { 
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); 
-        }
-
-        .panel-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1e293b;
-            margin: 0;
-        }
-
-        .panel-toggle {
-            padding: 8px;
-            background: transparent;
-            border: none;
-            border-radius: 12px;
-            color: #64748b;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            z-index: 3100; /* High z-index for clickability */
-        }
-
-        .panel-toggle:hover {
-            background: #f1f5f9;
-            color: #1e293b;
-        }
-
-        /* Tombol Toggle saat panel dilipat */
-        .collapsed .panel-toggle {
-            position: absolute;
-            right: -48px; /* Diperbesar untuk area klik yang lebih baik */
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 3100; /* Z-index lebih tinggi agar dapat diklik */
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            border-radius: 12px;
-        }
-
-        .legend-panel.collapsed .panel-toggle,
-        .map-info-panel.collapsed .panel-toggle {
-            left: -48px; /* Disesuaikan untuk panel legenda dan info */
-            right: auto;
-        }
-
-        /* Memastikan panel tidak mengganggu klik saat dilipat */
-        .modern-panel.collapsed {
-            overflow: visible; /* Memungkinkan tombol toggle dapat diakses */
-        }
-
-        /* Efek Hover untuk umpan balik yang lebih baik */
-        .panel-toggle:hover {
-            background: #f1f5f9;
-            color: #1e293b;
-            transform: translateY(-50%) scale(1.05); /* Sedikit skala untuk umpan balik */
-        }
-
-        /* Konten Panel */
-        .panel-content {
-            padding: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .collapsed .panel-content {
-            display: none;
-        }
-
-        /* Gaya Bagian */
-        .section-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #475569;
-            margin-bottom: 12px;
-        }
-
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #475569;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        /* Pemilih Peta Dasar */
-        .basemap-section {
-            margin-bottom: 24px;
-        }
-
-        .basemap-select {
-            width: 100%;
-            padding: 12px 16px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            font-weight: 500;
-            color: #1e293b;
-            transition: all 0.2s ease;
-        }
-
-        .basemap-select:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        /* Item Layer */
-        .layer-section {
-            margin-bottom: 24px;
-        }
-
-        .layer-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 320px;
-            overflow-y: auto;
-        }
-
-        .layer-item {
-            padding: 16px;
-            background: rgba(248, 250, 252, 0.5);
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            transition: all 0.2s ease;
-        }
-
-        .layer-item:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-
-        .layer-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .layer-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-        }
-
-        .layer-icon {
-            color: #64748b;
-            width: 16px;
-            height: 16px;
-        }
-
-        .layer-name {
-            font-size: 14px;
-            font-weight: 500;
-            color: #475569;
-        }
-
-        .visibility-toggle {
-            padding: 6px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .visibility-toggle.visible {
-            background: #dbeafe;
-            color: #2563eb;
-        }
-
-        .visibility-toggle.hidden {
-            background: #e2e8f0;
-            color: #94a3b8;
-        }
-
-        .visibility-toggle:hover.visible {
-            background: #bfdbfe;
-        }
-
-        .visibility-toggle:hover.hidden {
-            background: #cbd5e1;
-        }
-
-        /* Kontrol Opasitas */
-        .opacity-control {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .opacity-label {
-            font-size: 12px;
-            font-weight: 500;
-            color: #64748b;
-            min-width: 60px;
-        }
-
-        .opacity-slider {
-            flex: 1;
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 3px;
-            outline: none;
-            -webkit-appearance: none;
-            appearance: none;
-            cursor: pointer;
-        }
-
-        .opacity-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            background: #3b82f6;
-            border-radius: 50%;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .opacity-slider::-webkit-slider-thumb:hover {
-            background: #2563eb;
-            transform: scale(1.1);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .opacity-value {
-            font-size: 12px;
-            font-weight: 500;
-            color: #64748b;
-            min-width: 35px;
-        }
-
-        /* Item Legenda */
-        .legend-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 384px;
-            overflow-y: auto;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .legend-item:hover {
-            background: #f8fafc;
-        }
-
-        .legend-symbol {
-            width: 24px;
-            height: 24px;
-            border-radius: 8px;
-            border: 2px solid;
-            flex-shrink: 0;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             position: relative;
-        }
-
-        .legend-label {
-            flex: 1;
-            font-size: 14px;
-            font-weight: 500;
-            color: #475569;
-        }
-
-        .legend-toggle {
-            padding: 6px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .legend-toggle.visible {
-            background: #dcfce7;
-            color: #16a34a;
-        }
-
-        .legend-toggle.hidden {
-            background: #e2e8f0;
-            color: #94a3b8;
-        }
-
-        .legend-toggle:hover.visible {
-            background: #bbf7d0;
-        }
-
-        .legend-toggle:hover.hidden {
-            background: #cbd5e1;
-        }
-
-        /* Panel Info */
-        .info-content {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            font-size: 14px;
-        }
-
-        .info-row {
+            overflow: hidden;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .info-label {
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="stars" patternUnits="userSpaceOnUse" width="50" height="50"><circle cx="10" cy="10" r="0.5" fill="rgba(255,255,255,0.3)"/><circle cx="40" cy="40" r="0.7" fill="rgba(255,255,255,0.2)"/><circle cx="25" cy="20" r="0.4" fill="rgba(255,255,255,0.4)"/><circle cx="15" cy="35" r="0.6" fill="rgba(255,255,255,0.3)"/></pattern></defs><rect width="100" height="100" fill="url(%23stars)"/></svg>');
+            opacity: 0.4;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            margin-left: 20px;
+        }
+
+        /* Kontainer Tautan Header */
+        .header-links {
+            position: relative;
+            z-index: 1;
+            margin-right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-links a {
+            color: white;
+            text-decoration: none;
             font-weight: 500;
-            color: #64748b;
+            padding: 8px 16px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            background: linear-gradient(135deg, #0A1122 0%, #1B263B 100%);
         }
 
-        .info-value {
-            color: #1e293b;
-            font-family: 'JetBrains Mono', monospace;
+        .header-links a:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
-        /* Scrollbar Kustom */
-        .layer-list::-webkit-scrollbar,
-        .legend-list::-webkit-scrollbar {
-            width: 6px;
+        /* Gaya Navigasi */
+        nav {
+            background: linear-gradient(135deg, #0A1122 0%, #1B263B 100%);
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
-        .layer-list::-webkit-scrollbar-track,
-        .legend-list::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 3px;
+        nav a {
+            color: white;
+            margin: 0 20px;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
         }
 
-        .layer-list::-webkit-scrollbar-thumb,
-        .legend-list::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-
-        .layer-list::-webkit-scrollbar-thumb:hover,
-        .legend-list::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        /* Desain Responsif */
-        @media (max-width: 768px) {
-            .layer-control-panel,
-            .legend-panel,
-            .map-info-panel {
-                position: fixed;
-                top: 10px;
-                left: 10px;
-                right: 10px;
-                max-width: none;
-                min-width: auto;
-                z-index: 3000;
-            }
-            
-            .legend-panel {
-                top: auto;
-                bottom: 100px; /* Sesuaikan untuk menyisakan ruang bagi panel info */
-            }
-            
-            .map-info-panel {
-                top: auto;
-                bottom: 10px;
-            }
-            
-            .collapsed .panel-toggle {
-                z-index: 3100; /* Z-index tinggi untuk kemampuan klik pada perangkat seluler */
-            }
-        }
-        
-        /* Gaya Kontrol OpenLayers default */
-        .ol-control > * {
-            background-color: rgba(255, 255, 255, 0.9)!important;
-            color: #1e293b!important;
-            border-radius: 8px;
-            backdrop-filter: blur(10px);
-        }
-        .ol-control {
-            background-color: transparent !important;
-            padding: 4px !important;
-        }
-        .ol-attribution a, .gcd-gl-input::placeholder, .search-layer-input-search::placeholder {
-            color: #444444!important;
-        }
-        .search-layer-input-search {
-            background-color: #f8f8f8!important;
-        }
-        .ol-control > *:focus, .ol-control >*:hover {
-            background-color: rgba(248, 248, 248, 0.7)!important;
-        } 
-        </style>
-
-        <style>
-        html, body, #map {
+        nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
             width: 100%;
             height: 100%;
-            padding: 0;
-            margin: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            transition: left 0.5s;
         }
-        </style>
-        <title>SITAU - Peta Interaktif Desa Bawu</title>
-    
+
+        nav a:hover::before {
+            left: 100%;
+        }
+
+        nav a:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        /* Gaya Halaman Utama */
+        #homepage {
+            padding: 80px 20px;
+            text-align: center;
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #homepage video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            filter: brightness(0.7);
+        }
+
+        .homepage-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-section {
+            background: linear-gradient(145deg, rgba(30, 39, 66, 0.95) 0%, rgba(44, 57, 92, 0.95) 100%);
+            padding: 60px 40px;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(65, 90, 119, 0.2);
+            margin-bottom: 50px;
+        }
+
+        .hero-section h2 {
+            font-size: 3rem;
+            color: #E0E1DD;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            color: #B0B8C4;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.2s both;
+            text-align: justify;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #1B263B 0%, #415A77 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 25px rgba(65, 90, 119, 0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(65, 90, 119, 0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+
+        .cta-button i {
+            margin-left: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover i {
+            transform: translateX(5px);
+        }
+
+        /* Bagian Fitur */
+        .features-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .feature-card {
+            background: linear-gradient(145deg, rgba(30, 39, 66, 0.9) 0%, rgba(44, 57, 92, 0.9) 100%);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+            border: 1px solid rgba(65, 90, 119, 0.15);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: #778DA9;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            color: #E0E1DD;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: #B0B8C4;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* Gaya Tombol Unduh di Dalam Kartu Fitur */
+        .feature-card nav a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(145deg, rgba(65, 90, 119, 0.3) 0%, rgba(65, 90, 119, 0.3) 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: none;
+            text-align: center;
+            margin-top: 15px;
+            border: none;
+        }
+
+        .feature-card nav a:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(145deg, rgba(44, 57, 92, 0.9) 0%, rgba(30, 39, 66, 0.9) 100%);
+        }
+
+        .feature-card nav a i {
+            margin-left: 5px;
+        }
+
+        /* Animasi */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Gaya Footer */
+        footer {
+            background: linear-gradient(135deg, #0D1B2A 0%, #1B263B 100%);
+            color: white;
+            padding: 20px 0;
+            font-family: 'Poppins', sans-serif;
+            flex-shrink: 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            padding: 0 20px;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            margin: 10px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .footer-section p {
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-section a {
+            color: white;
+            text-decoration: none;
+            margin: 5px 0;
+            display: block;
+        }
+
+        .footer-section a:hover {
+            text-decoration: underline;
+        }
+
+        .social-icons a {
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            transition: opacity 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            opacity: 0.8;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Gaya Popup */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(30, 39, 66, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            color: #E0E1DD;
+            max-width: 600px;
+            width: 90%;
+            text-align: justify;
+            line-height: 1.6;
+        }
+
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            color: #B0B8C4;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .popup-close:hover {
+            color: #E0E1DD;
+        }
+    </style>
 </head>
-    <body>
-        <div id="map">
-            <div id="popup" class="ol-popup">
-                <a href="#" id="popup-closer" class="ol-popup-closer"></a>
-                <div id="popup-content"></div>
+<body>
+    <main>
+        <header>
+            <h1><i class="fas fa-map-marked-alt"></i> SITAU </h1>
+            <div class="header-links">
+                <a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <a href="register.html"><i class="fas fa-user-plus"></i> Register</a>
             </div>
-        </div>
+        </header>
 
-        <div class="modern-panel layer-control-panel" id="layerControlPanel">
-            <div class="panel-header">
-                <div class="panel-title-group">
-                    <div class="panel-icon layers">
-                        <i data-lucide="layers" style="width: 20px; height: 20px;"></i>
-                    </div>
-                    <h3 class="panel-title">Kontrol Layer</h3>
-                </div>
-                <button class="panel-toggle" id="layerControlToggle">
-                    <i data-lucide="chevron-left" style="width: 20px; height: 20px;"></i>
-                </button>
-            </div>
-            
-            <div class="panel-content">
-                <div class="basemap-section">
-                    <div class="section-label">
-                        <i data-lucide="map" style="width: 16px; height: 16px;"></i>
-                        Peta Dasar
-                    </div>
-                    <select class="basemap-select" id="basemapSelect">
-                        <option value="osm">OpenStreetMap</option>
-                        <option value="satellite">Citra Satelit</option>
-                        <option value="terrain">Terrain</option>
-                        <option value="topo">Topografi</option>
-                    </select>
+        <nav>
+            <a href="index.html"><i class="fas fa-home"></i> Home</a>
+            <a href="tentang.html"><i class="fas fa-info-circle"></i> Tentang</a>
+            <a href="contact.html"><i class="fas fa-address-book"></i> Contact</a>
+        </nav>
+
+        <!-- Halaman Utama -->
+        <div id="homepage">
+            <video autoplay muted loop>
+                <source src="Video/Animasi.mp4" type="video/mp4">
+                Browser Anda tidak mendukung tag video.
+            </video>
+            <div class="homepage-container">
+                <div class="hero-section">
+                    <h2 class="floating">
+                        <i class="fas fa-seedling"></i>
+                        Selamat Datang di SITAU - Sistem Informasi Pertanahan Desa Bawu
+                        <i class="fas fa-seedling"></i>
+                    </h2>
+                    <p>"Sistem Informasi Pertanahan Desa Bawu menjadi terobosan baru dalam pengelolaan tanah, menghadirkan transparansi dan kemudahan akses bagi masyarakat. Dengan teknologi pemetaan mutakhir, sistem ini menyajikan data kepemilikan, batas administrasi, dan nilai tanah secara akurat serta real-time. Lebih dari sekadar arsip statis, sistem ini mendorong pembangunan berkelanjutan, perencanaan yang lebih cerdas, dan pemerataan ekonomi, menjadikan pertanahan sebagai fondasi masa depan yang lebih transparan dan efektif bagi seluruh warga Desa Bawu."</p>
+                    <a href="login.html" class="cta-button">
+                        Mulai Eksplorasi <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
 
-                <div class="layer-section">
-                    <div class="section-title">
-                        <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
-                        Layer Data Pertanahan
+                <div class="features-section">
+                    <div class="feature-card">
+                        <i class="fas fa-map feature-icon"></i>
+                        <h3>Download Data Peta</h3>
+                        <p>Dapatkan data peta pertanahan Desa Bawu! Dengan satu klik dan semua informasi ada di tangan Anda.</p>
+                        <nav>
+                            <a href="download.html"><i class="fas fa-download"></i> Data Download</a>
+                        </nav>
                     </div>
-                    
-                    <div class="layer-list">
-                        <div class="layer-item" data-layer="bidangTanah">
-                            <div class="layer-header">
-                                <div class="layer-info">
-                                    <i data-lucide="map-pin" class="layer-icon"></i>
-                                    <span class="layer-name">Bidang Tanah</span>
-                                </div>
-                                <button class="visibility-toggle visible" data-layer="bidangTanah">
-                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
-                                </button>
-                            </div>
-                            <div class="opacity-control">
-                                <span class="opacity-label">Opacity:</span>
-                                <input type="range" class="opacity-slider" min="0" max="100" value="100" data-layer="bidangTanah">
-                                <span class="opacity-value">100%</span>
-                            </div>
-                        </div>
-
-                        <div class="layer-item" data-layer="hak">
-                            <div class="layer-header">
-                                <div class="layer-info">
-                                    <i data-lucide="home" class="layer-icon"></i>
-                                    <span class="layer-name">Hak Kepemilikan</span>
-                                </div>
-                                <button class="visibility-toggle visible" data-layer="hak">
-                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
-                                </button>
-                            </div>
-                            <div class="opacity-control">
-                                <span class="opacity-label">Opacity:</span>
-                                <input type="range" class="opacity-slider" min="0" max="100" value="100" data-layer="hak">
-                                <span class="opacity-value">100%</span>
-                            </div>
-                        </div>
-
-                        <div class="layer-item" data-layer="pl">
-                            <div class="layer-header">
-                                <div class="layer-info">
-                                    <i data-lucide="tree-pine" class="layer-icon"></i>
-                                    <span class="layer-name">Penggunaan Lahan</span>
-                                </div>
-                                <button class="visibility-toggle visible" data-layer="pl">
-                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
-                                </button>
-                            </div>
-                            <div class="opacity-control">
-                                <span class="opacity-label">Opacity:</span>
-                                <input type="range" class="opacity-slider" min="0" max="100" value="100" data-layer="pl">
-                                <span class="opacity-value">100%</span>
-                            </div>
-                        </div>
-
-                        <div class="layer-item" data-layer="znt">
-                            <div class="layer-header">
-                                <div class="layer-info">
-                                    <i data-lucide="building" class="layer-icon"></i>
-                                    <span class="layer-name">Zona Nilai Tanah</span>
-                                </div>
-                                <button class="visibility-toggle visible" data-layer="znt">
-                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
-                                </button>
-                            </div>
-                            <div class="opacity-control">
-                                <span class="opacity-label">Opacity:</span>
-                                <input type="range" class="opacity-slider" min="0" max="100" value="100" data-layer="znt">
-                                <span class="opacity-value">100%</span>
-                            </div>
-                        </div>
+                    <div class="feature-card">
+                        <i class="fas fa-database feature-icon"></i>
+                        <h3>Profil Wilayah Desa Bawu</h3>
+                        <p>Bawu adalah desa di kecamatan Kemusu, Boyolali, Jawa Tengah, Indonesia.</p>
+                        <nav>
+                            <a href="database.html"><i class="fas fa-download"></i> Profil Wilayah</a>
+                        </nav>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-user feature-icon"></i>
+                        <h3>Anggota Kelompok C2</h3>
+                        <p>Dapat dilihat anggota dan logbook anggota kelompok kami</p>
+                        <nav>
+                            <a href="anggota.html"><i class="fas fa-download"></i> Data Anggota Kelompok</a>
+                        </nav>
                     </div>
                 </div>
             </div>
         </div>
+    </main>
 
-        <div class="modern-panel legend-panel" id="legendPanel">
-            <div class="panel-header">
-                <div class="panel-title-group">
-                    <div class="panel-icon legend">
-                        <i data-lucide="info" style="width: 20px; height: 20px;"></i>
-                    </div>
-                    <h3 class="panel-title">Layer Peta</h3>
-                </div>
-                <button class="panel-toggle" id="legendToggle">
-                    <i data-lucide="chevron-right" style="width: 20px; height: 20px;"></i>
-                </button>
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>KONTAK KAMI</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Jl. Banjarsari, Tembalang, Kota Semarang</p>
+                <p><i class="fas fa-phone"></i> 085640214548</p>
+                <p><i class="fas fa-envelope"></i> SITAU@gmail.com</p>
             </div>
-            
-            <div class="panel-content">
-                <div class="legend-list">
-                    <div class="legend-item" data-layer="bidangTanah">
-                        <div class="legend-symbol" style="background-color: #ff6b6b80; border-color: #ff6b6b;"></div>
-                        <span class="legend-label">Bidang Tanah</span>
-                        <button class="legend-toggle visible" data-layer="bidangTanah">
-                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
-                        </button>
-                    </div>
-
-                    <div class="legend-item" data-layer="hak">
-                        <div class="legend-symbol" style="background-color: #4ecdc480; border-color: #4ecdc4;"></div>
-                        <span class="legend-label">Hak Kepemilikan</span>
-                        <button class="legend-toggle visible" data-layer="hak">
-                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
-                        </button>
-                    </div>
-
-                    <div class="legend-item" data-layer="pl">
-                        <div class="legend-symbol" style="background-color: #45b7d180; border-color: #45b7d1;"></div>
-                        <span class="legend-label">Penggunaan Lahan</span>
-                        <button class="legend-toggle visible" data-layer="pl">
-                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
-                        </button>
-                    </div>
-
-                    <div class="legend-item" data-layer="znt">
-                        <div class="legend-symbol" style="background-color: #f9ca2480; border-color: #f9ca24;"></div>
-                        <span class="legend-label">Zona Nilai Tanah</span>
-                        <button class="legend-toggle visible" data-layer="znt">
-                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
-                        </button>
-                    </div>
+            <div class="footer-section">
+                <h3>TAUTAN CEPAT</h3>
+                <a href="#" onclick="showPopup('privacy')">Kebijakan Privasi</a>
+                <a href="#" onclick="showPopup('terms')">Syarat dan Ketentuan</a>
+                <a href="#" onclick="showPopup('faq')">FAQ</a>
+            </div>
+            <div class="footer-section">
+                <h3>TERHUBUNG</h3>
+                <div class="social-icons">
+                    <a href="https://www.instagram.com/ptrp_undip22?igsh=MXF2NjY3bnpkNGQ4bw=="><i class="fab fa-instagram"></i></a>
+                    <a href="https://youtube.com/@ptrp22?si=CmfDVRIQkGSnqfcV"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
         </div>
-
-        <div class="modern-panel map-info-panel" id="mapInfoPanel">
-            <div class="panel-header">
-                <div class="panel-title-group">
-                    <div class="panel-icon info">
-                        <i data-lucide="info" style="width: 20px; height: 20px;"></i>
-                    </div>
-                    <h4 class="panel-title">Informasi Peta</h4>
-                </div>
-                <button class="panel-toggle" id="mapInfoToggle">
-                    <i data-lucide="chevron-right" style="width: 20px; height: 20px;"></i>
-                </button>
-            </div>
-            
-            <div class="panel-content">
-                <div class="info-content">
-                    <div class="info-row">
-                        <span class="info-label">Lokasi:</span>
-                        <span class="info-value">Desa Bawu, Kemusu, Boyolali</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Koordinat:</span>
-                        <span class="info-value" id="mouseCoords">-7.5234°, 110.7234°</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Skala:</span>
-                        <span class="info-value" id="mapScale">1:10,000</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Proyeksi:</span>
-                        <span class="info-value">EPSG:3857</span>
-                    </div>
-                </div>
-            </div>
+        <div class="footer-bottom">
+            <p>© 2025 SITAU - Sistem Informasi Pertanahan Desa Bawu.</p>
         </div>
+    </footer>
 
-        <script src="resources/qgis2web_expressions.js"></script>
-        <script src="./resources/functions.js"></script>
-        <script src="./resources/ol.js"></script>
-        <script src="layers/BidangTanah_Bawu_1.js"></script><script src="layers/Hak_Bawu_2.js"></script><script src="layers/PL_Bawu_3.js"></script><script src="layers/ZNT_Bawu_4.js"></script>
-        <script src="styles/BidangTanah_Bawu_1_style.js"></script><script src="styles/Hak_Bawu_2_style.js"></script><script src="styles/PL_Bawu_3_style.js"></script><script src="styles/ZNT_Bawu_4_style.js"></script>
-        <script src="./layers/layers.js" type="text/javascript"></script> 
-        <script src="./resources/Autolinker.min.js"></script>
-        <script src="./resources/qgis2web.js"></script>
+    <!-- Popup -->
+    <div class="popup-overlay" id="popupOverlay" onclick="hidePopup()"></div>
+    <div class="popup" id="privacyPopup">
+        <span class="popup-close" onclick="hidePopup()">×</span>
+        <h3>Kebijakan Privasi</h3>
+        <p>Kami berkomitmen untuk melindungi privasi dan keamanan data pengguna dalam sistem WebGIS ini. Informasi yang dikumpulan, termasuk data lokasi, pencarian, dan interaksi pengguna, digunakan semata-mata untuk meningkatkan kualitas layanan dan pengalaman pengguna.</p>
+        <p><strong>Pengumpulan Data</strong> Sistem ini dapat mengumpulkan informasi terkait akses pengguna, seperti alamat IP, jenis perangkat, dan data lokasi, untuk keperluan analisis dan peningkatan fitur.</p>
+        <p><strong>Penggunaan Data</strong> Data yang dikumpulan tidak akan disebarluaskan atau dijual kepada pihak ketiga tanpa izin pengguna, kecuali dalam hal diperlukan untuk kepentingan hukum atau pengembangan sistem yang lebih baik.</p>
+        <p><strong>Keamanan Data</strong> Kami menerapkan standar keamanan tinggi untuk melindungi data pengguna dari akses yang tidak sah, manipulasi, atau penyalahgunaan.</p>
+        <p>Dengan menggunakan layanan ini, pengguna dianggap telah menyetujui kebijakan privasi yang berlaku. Kami dapat memperbarui kebijakan ini sesuai dengan perkembangan teknologi dan regulasi yang berlaku.</p>
+    </div>
+    <div class="popup" id="termsPopup">
+        <span class="popup-close" onclick="hidePopup()">×</span>
+        <h3>Syarat dan Ketentuan</h3>
+        <p><strong>Penerimaan Syarat</strong> Dengan mengakses dan menggunakan layanan WebGIS ini, pengguna dianggap telah membaca, memahami, dan menyetujui syarat dan ketentuan yang berlaku.</p>
+        <p><strong>Penggunaan Layanan</strong> WebGIS ini disediakan untuk tujuan informasi dan analisis. Pengguna dilarang menggunakan data dan informasi yang tersedia untuk tindakan yang melanggar hukum atau merugikan pihak lain.</p>
+        <p><strong>Hak Cipta dan Kepemilikan Data</strong> Semua data, peta, dan informasi yang tersedia dalam sistem ini dilindungi oleh hak cipta dan hanya boleh digunakan sesuai dengan peraturan yang berlaku. Pengguna tidak diperkenankan menyebarluaskan, memodifikasi, atau menggunakan data tanpa izin dari pihak yang berwenang.</p>
+        <p><strong>Keakuratan Data</strong> Kami berusaha menyediakan informasi yang akurat dan terkini, namun tidak menjamin bahwa semua data dalam WebGIS ini bebas dari kesalahan atau kekeliruan. Pengguna diharapkan melakukan verifikasi tambahan sebelum mengambil keputusan berdasarkan informasi yang tersedia.</p>
+        <p><strong>Keamanan dan Privasi</strong> Kami berkomitmen untuk menjaga keamanan data pengguna. Namun, pengguna juga bertanggung jawab untuk menjaga kerahasiaan informasi akun mereka dan tidak menyalahgunakan akses terhadap sistem.</p>
+        <p><strong>Perubahan Syarat dan Ketentuan</strong> Syarat dan ketentuan ini dapat diperbarui sewaktu-waktu sesuai dengan perkembangan layanan dan kebijakan yang berlaku. Pengguna disarankan untuk memeriksa halaman ini secara berkala.</p>
+    </div>
+    <div class="popup" id="faqPopup">
+        <span class="popup-close" onclick="hidePopup()">×</span>
+        <h3>FAQ</h3>
+        <p>1. Apa itu WebGIS? WebGIS adalah sistem informasi geografis berbasis web yang memungkinkan pengguna mengakses, menganalisis, dan memvisualisasikan data spasial secara interaktif melalui internet.</p>
+        <p>2. Bagaimana cara menggunakan WebGIS ini? Pengguna dapat menjelajahi peta interaktif, mencari lokasi spesifik, melihat informasi terkait zona dan wilayah, serta menggunakan berbagai fitur analisis yang tersedia.</p>
+        <p>3. Apakah data dalam WebGIS ini selalu diperbarui? Kami berusaha untuk memperbarui data secara berkala sesuai dengan sumber resmi dan pemutakhiran dari instansi terkait. Namun, jika Anda menemukan data yang perlu diperbaiki, silakan hubungi kami.</p>
+        <p>4. Bisakah saya mengunduh peta dari WebGIS ini? Beberapa data dan peta dapat diunduh sesuai dengan kebijakan yang berlaku. Pastikan untuk memeriksa ketentuan penggunaan sebelum mengunduh atau menyebarluaskan data.</p>
+        <p>5. Apakah WebGIS ini gratis untuk digunakan? Sebagian besar fitur dapat digunakan secara gratis. Namun, beberapa layanan tambahan atau data spesifik mungkin memerlukan izin atau akses khusus.</p>
+        <p>6. Bagaimana cara menghubungi tim pengelola WebGIS? Anda dapat menghubungi kami melalui halaman kontak yang tersedia atau melalui email resmi yang telah disediakan dalam situs.</p>
+    </div>
 
-        <script>
-        // Inisialisasi ikon Lucide saat DOM dimuat
-        document.addEventListener('DOMContentLoaded', function() {
-            lucide.createIcons();
-        });
+    <video autoplay muted loop id="backgroundVideo" style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; z-index: -1;">
+        <source src="Vidio/Animasi.mp4.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
 
-        // Menunggu inisialisasi objek peta OpenLayers
-        let mapInitialized = false;
-        let layerReferences = {};
-
-        // Status visibilitas dan opasitas layer
-        const layerState = {
-            bidangTanah: { visible: true, opacity: 100 },
-            hak: { visible: true, opacity: 100 },
-            pl: { visible: true, opacity: 100 },
-            znt: { visible: true, opacity: 100 }
-        };
-
-        // Fungsi untuk menunggu objek peta OpenLayers tersedia
-        function waitForMap() {
-            // Periksa apakah 'map' didefinisikan secara global oleh skrip OpenLayers/QGIS2Web
-            if (typeof map !== 'undefined' && map && typeof map.on === 'function') {
-                mapInitialized = true;
-                setupLayerReferences(); // Inisialisasi referensi layer OpenLayers
-                initializeModernControls(); // Inisialisasi kontrol panel kustom
-            } else {
-                // Coba lagi setelah penundaan singkat jika peta belum siap
-                setTimeout(waitForMap, 100);
+    <script>
+        function showPopup(type) {
+            if (type === 'privacy') {
+                document.getElementById('privacyPopup').style.display = 'block';
+            } else if (type === 'terms') {
+                document.getElementById('termsPopup').style.display = 'block';
+            } else if (type === 'faq') {
+                document.getElementById('faqPopup').style.display = 'block';
             }
+            document.getElementById('popupOverlay').style.display = 'block';
         }
 
-        // Mengatur referensi ke objek layer OpenLayers yang sebenarnya
-        function setupLayerReferences() {
-            // Pastikan variabel layer global ada sebelum merujuknya
-            if (typeof lyr_BidangTanah_Bawu_1 !== 'undefined') {
-                layerReferences.bidangTanah = lyr_BidangTanah_Bawu_1;
-            }
-            if (typeof lyr_Hak_Bawu_2 !== 'undefined') {
-                layerReferences.hak = lyr_Hak_Bawu_2;
-            }
-            if (typeof lyr_PL_Bawu_3 !== 'undefined') {
-                layerReferences.pl = lyr_PL_Bawu_3;
-            }
-            if (typeof lyr_ZNT_Bawu_4 !== 'undefined') {
-                layerReferences.znt = lyr_ZNT_Bawu_4;
-            }
+        function hidePopup() {
+            document.getElementById('privacyPopup').style.display = 'none';
+            document.getElementById('termsPopup').style.display = 'none';
+            document.getElementById('faqPopup').style.display = 'none';
+            document.getElementById('popupOverlay').style.display = 'none';
         }
-
-        // Fungsi utama untuk menginisialisasi semua kontrol kustom
-        function initializeModernControls() {
-            setupPanelToggles(); // Mengatur fungsi buka/tutup panel
-            setupBasemapControl(); // Mengatur kontrol peta dasar
-            setupLayerVisibilityControls(); // Mengatur kontrol visibilitas layer (ikon mata)
-            setupOpacityControls(); // Mengatur kontrol opasitas layer
-            setupLegendControls(); // Mengatur kontrol legenda (juga ikon mata)
-            setupCoordinateTracking(); // Mengatur pelacakan koordinat mouse
-            setupScaleTracking(); // Mengatur pelacakan skala peta
-        }
-
-        // Mengatur fungsionalitas buka/tutup untuk panel samping
-        function setupPanelToggles() {
-            const layerControlPanel = document.getElementById('layerControlPanel');
-            const layerControlToggle = document.getElementById('layerControlToggle');
-            const legendPanel = document.getElementById('legendPanel');
-            const legendToggle = document.getElementById('legendToggle');
-            const mapInfoPanel = document.getElementById('mapInfoPanel');
-            const mapInfoToggle = document.getElementById('mapInfoToggle');
-
-            // Toggle Panel Kontrol Layer
-            if (layerControlToggle && layerControlPanel) {
-                layerControlToggle.onclick = function() {
-                    layerControlPanel.classList.toggle('collapsed');
-                    const icon = this.querySelector('i');
-                    if (layerControlPanel.classList.contains('collapsed')) {
-                        icon.setAttribute('data-lucide', 'chevron-right');
-                    } else {
-                        icon.setAttribute('data-lucide', 'chevron-left');
-                    }
-                    lucide.createIcons(); // Perbarui ikon
-                };
-            }
-
-            // Toggle Panel Legenda
-            if (legendToggle && legendPanel) {
-                legendToggle.onclick = function() {
-                    legendPanel.classList.toggle('collapsed');
-                    const icon = this.querySelector('i');
-                    if (legendPanel.classList.contains('collapsed')) {
-                        icon.setAttribute('data-lucide', 'chevron-left');
-                    } else {
-                        icon.setAttribute('data-lucide', 'chevron-right');
-                    }
-                    lucide.createIcons(); // Perbarui ikon
-                };
-            }
-
-            // Toggle Panel Informasi Peta
-            if (mapInfoToggle && mapInfoPanel) {
-                mapInfoToggle.onclick = function() {
-                    mapInfoPanel.classList.toggle('collapsed');
-                    const icon = this.querySelector('i');
-                    if (mapInfoPanel.classList.contains('collapsed')) {
-                        icon.setAttribute('data-lucide', 'chevron-left');
-                    } else {
-                        icon.setAttribute('data-lucide', 'chevron-right');
-                    }
-                    lucide.createIcons(); // Perbarui ikon
-                };
-            }
-        }
-
-        // Mengatur kontrol pemilihan peta dasar
-        function setupBasemapControl() {
-            const basemapSelect = document.getElementById('basemapSelect');
-            if (basemapSelect) {
-                basemapSelect.addEventListener('change', function() {
-                    switchBasemap(this.value);
-                });
-            }
-        }
-
-        // Mengatur kontrol visibilitas layer (ikon mata di panel kontrol)
-        function setupLayerVisibilityControls() {
-            const visibilityToggles = document.querySelectorAll('.visibility-toggle');
-            visibilityToggles.forEach(toggle => {
-                toggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation(); // Mencegah event bubbling
-                    const layerKey = this.getAttribute('data-layer');
-                    if (layerKey && layerState[layerKey]) {
-                        const isVisible = !layerState[layerKey].visible;
-                        layerState[layerKey].visible = isVisible; // Perbarui status internal
-                        toggleLayerVisibility(layerKey, isVisible); // Perbarui visibilitas layer peta
-
-                        updateVisibilityButton(this, isVisible); // Perbarui tampilan tombol (ikon mata)
-                        syncLegendToggle(layerKey, isVisible); // Sinkronkan dengan legenda
-                    }
-                });
-            });
-        }
-
-        // Mengatur kontrol opasitas layer (slider)
-        function setupOpacityControls() {
-            const opacitySliders = document.querySelectorAll('.opacity-slider');
-            opacitySliders.forEach(slider => {
-                slider.addEventListener('input', function() {
-                    const layerKey = this.getAttribute('data-layer');
-                    const opacity = parseInt(this.value);
-                    layerState[layerKey].opacity = opacity; // Perbarui status internal
-                    setLayerOpacity(layerKey, opacity / 100); // Perbarui opasitas layer peta
-
-                    const valueDisplay = this.parentElement.querySelector('.opacity-value');
-                    valueDisplay.textContent = opacity + '%'; // Perbarui nilai tampilan
-                });
-            });
-        }
-
-        // Mengatur kontrol legenda (ikon mata di panel legenda)
-        function setupLegendControls() {
-            const legendToggles = document.querySelectorAll('.legend-toggle');
-            legendToggles.forEach(toggle => {
-                toggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation(); // Mencegah event bubbling
-                    const legendItem = this.closest('.legend-item');
-                    const layerKey = legendItem.getAttribute('data-layer');
-                    if (layerKey && layerState[layerKey]) {
-                        const isVisible = !layerState[layerKey].visible;
-                        layerState[layerKey].visible = isVisible; // Perbarui status internal
-                        toggleLayerVisibility(layerKey, isVisible); // Perbarui visibilitas layer peta
-
-                        updateLegendButton(this, isVisible); // Perbarui tampilan tombol (ikon mata)
-                        syncVisibilityToggle(layerKey, isVisible); // Sinkronkan dengan panel kontrol
-                    }
-                });
-            });
-        }
-
-        // Mengatur pelacakan koordinat mouse di peta
-        function setupCoordinateTracking() {
-            if (mapInitialized && map && typeof map.on === 'function') {
-                map.on('pointermove', function(evt) {
-                    const coordinate = ol.proj.toLonLat(evt.coordinate);
-                    const coords = coordinate[1].toFixed(6) + '°, ' + coordinate[0].toFixed(6) + '°';
-                    const coordsElement = document.getElementById('mouseCoords');
-                    if (coordsElement) {
-                        coordsElement.textContent = coords;
-                    }
-                });
-            }
-        }
-
-        // Mengatur pelacakan skala peta
-        function setupScaleTracking() {
-            if (mapInitialized && map && typeof map.getView === 'function') {
-                map.getView().on('change:resolution', function() {
-                    const resolution = map.getView().getResolution();
-                    const units = map.getView().getProjection().getUnits();
-                    const dpi = 25.4 / 0.28; // Standard DPI for screen
-                    const mpu = ol.proj.METERS_PER_UNIT[units];
-                    const scale = resolution * mpu * 39.37 * dpi;
-                    const scaleElement = document.getElementById('mapScale');
-                    if (scaleElement) {
-                        scaleElement.textContent = '1:' + Math.round(scale).toLocaleString();
-                    }
-                });
-            }
-        }
-
-        // Fungsi pembantu: Memperbarui tampilan tombol visibilitas (ikon mata)
-        function updateVisibilityButton(button, isVisible) {
-            const icon = button.querySelector('i');
-            if (icon) {
-                button.classList.remove('visible', 'hidden');
-                button.classList.add(isVisible ? 'visible' : 'hidden');
-                icon.setAttribute('data-lucide', isVisible ? 'eye' : 'eye-off');
-                lucide.createIcons(); // Penting: render ulang ikon setelah perubahan atribut
-            }
-        }
-
-        // Fungsi pembantu: Memperbarui tampilan tombol legenda (ikon mata)
-        function updateLegendButton(button, isVisible) {
-            const icon = button.querySelector('i');
-            if (icon) {
-                button.classList.remove('visible', 'hidden');
-                button.classList.add(isVisible ? 'visible' : 'hidden');
-                icon.setAttribute('data-lucide', isVisible ? 'eye' : 'eye-off');
-                lucide.createIcons(); // Penting: render ulang ikon setelah perubahan atribut
-            }
-        }
-
-        // Fungsi pembantu: Sinkronkan tombol legenda dengan kontrol layer
-        function syncLegendToggle(layerKey, isVisible) {
-            const legendItem = document.querySelector(`.legend-item[data-layer="${layerKey}"]`);
-            if (legendItem) {
-                const legendToggle = legendItem.querySelector('.legend-toggle');
-                if (legendToggle) {
-                    updateLegendButton(legendToggle, isVisible);
-                }
-            }
-        }
-
-        // Fungsi pembantu: Sinkronkan tombol kontrol layer dengan legenda
-        function syncVisibilityToggle(layerKey, isVisible) {
-            const visibilityToggle = document.querySelector(`.visibility-toggle[data-layer="${layerKey}"]`);
-            if (visibilityToggle) {
-                updateVisibilityButton(visibilityToggle, isVisible);
-            }
-        }
-
-        // Fungsi untuk mengganti peta dasar
-        function switchBasemap(basemapType) {
-            if (!mapInitialized || !map || typeof map.getLayers !== 'function') {
-                return;
-            }
-            
-            const layers = map.getLayers().getArray();
-            // Asumsikan layer pertama adalah basemap
-            let baseLayer = layers[0]; 
-            
-            let newBaseLayer;
-            
-            switch(basemapType) {
-                case 'satellite':
-                    newBaseLayer = new ol.layer.Tile({
-                        source: new ol.source.XYZ({
-                            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                            attributions: 'Tiles © Esri'
-                        })
-                    });
-                    break;
-                case 'terrain':
-                    newBaseLayer = new ol.layer.Tile({
-                        source: new ol.source.XYZ({
-                            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}',
-                            attributions: 'Tiles © Esri'
-                        })
-                    });
-                    break;
-                case 'topo':
-                    newBaseLayer = new ol.layer.Tile({
-                        source: new ol.source.XYZ({
-                            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-                            attributions: 'Tiles © Esri'
-                        })
-                    });
-                    break;
-                default: // osm
-                    newBaseLayer = new ol.layer.Tile({
-                        source: new ol.source.OSM()
-                    });
-            }
-            
-            // Ganti basemap di posisi pertama
-            map.getLayers().setAt(0, newBaseLayer);
-        }
-
-        // Fungsi untuk mengubah visibilitas layer OpenLayers
-        function toggleLayerVisibility(layerKey, visible) {
-            const layer = layerReferences[layerKey];
-            if (layer && typeof layer.setVisible === 'function') {
-                layer.setVisible(visible);
-            }
-        }
-
-        // Fungsi untuk mengatur opasitas layer OpenLayers
-        function setLayerOpacity(layerKey, opacity) {
-            const layer = layerReferences[layerKey];
-            if (layer && typeof layer.setOpacity === 'function') {
-                layer.setOpacity(opacity);
-            }
-        }
-
-        // Perilaku responsif untuk panel saat ukuran jendela diubah
-        window.addEventListener('resize', function() {
-            if (window.innerWidth <= 768) {
-                const legendPanel = document.getElementById('legendPanel');
-                const layerControlPanel = document.getElementById('layerControlPanel');
-                const mapInfoPanel = document.getElementById('mapInfoPanel');
-                
-                // Lipat panel saat di layar kecil jika tidak dilipat
-                if (legendPanel && !legendPanel.classList.contains('collapsed')) {
-                    legendPanel.classList.add('collapsed');
-                    const legendToggle = document.getElementById('legendToggle');
-                    const icon = legendToggle.querySelector('i');
-                    icon.setAttribute('data-lucide', 'chevron-left');
-                    lucide.createIcons();
-                }
-                
-                if (layerControlPanel && !layerControlPanel.classList.contains('collapsed')) {
-                    layerControlPanel.classList.add('collapsed');
-                    const layerToggle = document.getElementById('layerControlToggle');
-                    const icon = layerToggle.querySelector('i');
-                    icon.setAttribute('data-lucide', 'chevron-right');
-                    lucide.createIcons();
-                }
-                
-                if (mapInfoPanel && !mapInfoPanel.classList.contains('collapsed')) {
-                    mapInfoPanel.classList.add('collapsed');
-                    const mapInfoToggle = document.getElementById('mapInfoToggle');
-                    const icon = mapInfoToggle.querySelector('i');
-                    icon.setAttribute('data-lucide', 'chevron-left');
-                    lucide.createIcons();
-                }
-            }
-        });
-
-        // Panggil waitForMap() saat DOM siap, atau segera jika sudah siap
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', waitForMap);
-        } else {
-            waitForMap();
-        }
-        </script>
-    </body>
+    </script>
+</body>
 </html>

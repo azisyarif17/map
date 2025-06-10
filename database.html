@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Pertanahan - Profil WIlayah Desa Bawu Kecamatan Kemusu</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background: linear-gradient(135deg, #1B263B 0%, #2E3B55 50%, #415A77 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1 0 auto;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, #0D1B2A 0%, #1B263B 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="stars" patternUnits="userSpaceOnUse" width="50" height="50"><circle cx="10" cy="10" r="0.5" fill="rgba(255,255,255,0.3)"/><circle cx="40" cy="40" r="0.7" fill="rgba(255,255,255,0.2)"/><circle cx="25" cy="20" r="0.4" fill="rgba(255,255,255,0.4)"/><circle cx="15" cy="35" r="0.6" fill="rgba(255,255,255,0.3)"/></pattern></defs><rect width="100" height="100" fill="url(%23stars)"/></svg>');
+            opacity: 0.4;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            margin-left: 20px;
+        }
+
+        /* Header Links Container */
+        .header-links {
+            position: relative;
+            z-index: 1;
+            margin-right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            background: linear-gradient(135deg, #0A1122 0%, #1B263B 100%);
+        }
+
+        .header-links a:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        /* Navigation Styles */
+        nav {
+            background: linear-gradient(135deg, #0A1122 0%, #1B263B 100%);
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        nav a {
+            color: white;
+            margin: 0 20px;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            transition: left 0.5s;
+        }
+
+        nav a:hover::before {
+            left: 100%;
+        }
+
+        nav a:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        /* Back Button Styles */
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #1B263B 0%, #415A77 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            margin: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(65, 90, 119, 0.4);
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(65, 90, 119, 0.5);
+        }
+
+        /* Database Container Styles */
+        #database-container {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 20px;
+            background: linear-gradient(145deg, rgba(30, 39, 66, 0.95) 0%, rgba(44, 57, 92, 0.95) 100%);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(65, 90, 119, 0.2);
+        }
+
+        #database-container h2 {
+            text-align: center;
+            color: #E0E1DD;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border: 1px solid #415A77;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        th {
+            background: linear-gradient(135deg, #1B263B 0%, #415A77 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        td {
+            color: #B0B8C4;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(30, 39, 66, 0.5);
+        }
+
+        tr:hover {
+            background: rgba(44, 57, 92, 0.7);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+
+        /* Map and Description Styles */
+        #map-section {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: linear-gradient(145deg, rgba(30, 39, 66, 0.95) 0%, rgba(44, 57, 92, 0.95) 100%);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        #map-section h2 {
+            color: white; /* Changed to white as requested */
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        #map-section img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        #map-section p {
+            color: #E0E1DD;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            text-align: justify;
+            padding: 0 20px;
+        }
+
+        /* Footer Styles */
+        footer {
+            background: linear-gradient(135deg, #0D1B2A 0%, #1B263B 100%);
+            color: white;
+            padding: 20px 0;
+            font-family: 'Poppins', sans-serif;
+            flex-shrink: 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            padding: 0 20px;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            margin: 10px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .footer-section p {
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-section a {
+            color: white;
+            text-decoration: none;
+            margin: 5px 0;
+            display: block;
+        }
+
+        .footer-section a:hover {
+            text-decoration: underline;
+        }
+
+        .social-icons a {
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            transition: opacity 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            opacity: 0.8;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Popup Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(30, 39, 66, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            color: #E0E1DD;
+            max-width: 600px;
+            width: 90%;
+            text-align: justify;
+            line-height: 1.6;
+        }
+
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            color: #B0B8C4;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .popup-close:hover {
+            color: #E0E1DD;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <header>
+            <h1><i class="fas fa-map-marked-alt"></i> SITAU</h1>
+            <div class="header-links">
+                <a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <a href="register.html"><i class="fas fa-user-plus"></i> Register</a>
+            </div>
+        </header>
+
+        <nav>
+            <a href="index.html"><i class="fas fa-home"></i> Home</a>
+            <a href="tentang.html"><i class="fas fa-info-circle"></i> Tentang</a>
+            <a href="contact.html"><i class="fas fa-address-book"></i> Contact</a>
+        </nav>
+
+        <!-- Back Button -->
+        <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i> Kembali</a>
+
+        <!-- Map and Description Section -->
+        <div id="map-section">
+            <h2><i class="fas fa-map"></i> Peta Wilayah Desa Bawu</h2>
+            <img src="image\Peta Admin Desa Bawu.png" alt="Peta Desa Bawu">
+            <p>
+                Desa Bawu adalah salah satu desa yang terletak di Kecamatan Kemusu, Kabupaten Boyolali, Jawa Tengah. Secara administratif, desa ini berbatasan dengan Kecamatan Kendel di sebelah barat, Desa Klewor di sebelah timur, serta Kecamatan Andong dan Klego di sebelah selatan. 
+
+Kemusu sendiri merupakan kecamatan dengan luas wilayah sekitar 81,43 km², menjadikannya salah satu kecamatan dengan cakupan area yang cukup besar di Kabupaten Boyolali. Desa Bawu berada dalam wilayah ini dan memiliki karakteristik geografis yang mencerminkan kondisi umum Kecamatan Kemusu.
+
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-container">
+                <div class="footer-section">
+                    <h3>KONTAK KAMI</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> Jl. Banjarsari, Tembalang, Kota Semarang</p>
+                    <p><i class="fas fa-phone"></i> 085640214548</p>
+                    <p><i class="fas fa-envelope"></i> SITAU@gmail.com</p>
+                </div>
+                <div class="footer-section">
+                    <h3>TAUTAN CEPAT</h3>
+                    <a href="#" onclick="showPopup('privacy')">Kebijakan Privasi</a>
+                    <a href="#" onclick="showPopup('terms')">Syarat dan Ketentuan</a>
+                    <a href="#" onclick="showPopup('faq')">FAQ</a>
+                </div>
+                <div class="footer-section">
+                    <h3>TERHUBUNG</h3>
+                    <div class="social-icons">
+                        <a href="https://www.instagram.com/ptrp_undip22?igsh=MXF2NjY3bnpkNGQ4bw=="><i class="fab fa-instagram"></i></a>
+                        <a href="https://youtube.com/@ptrp22?si=CmfDVRIQkGSnqfcV"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 SITAU - Sistem Informasi Pertanahan Desa Bawu.</p>
+            </div>
+        </footer>
+
+        <!-- Popup -->
+        <div class="popup-overlay" id="popupOverlay" onclick="hidePopup()"></div>
+        <div class="popup" id="privacyPopup">
+            <span class="popup-close" onclick="hidePopup()">×</span>
+            <h3>Kebijakan Privasi</h3>
+            <p>Kami berkomitmen untuk melindungi privasi dan keamanan data pengguna dalam sistem WebGIS ini. Informasi yang dikumpulan, termasuk data lokasi, pencarian, dan interaksi pengguna, digunakan semata-mata untuk meningkatkan kualitas layanan dan pengalaman pengguna.</p>
+            <p><strong>Pengumpulan Data</strong> Sistem ini dapat mengumpulkan informasi terkait akses pengguna, seperti alamat IP, jenis perangkat, dan data lokasi, untuk keperluan analisis dan peningkatan fitur.</p>
+            <p><strong>Penggunaan Data</strong> Data yang dikumpulan tidak akan disebarluaskan atau dijual kepada pihak ketiga tanpa izin pengguna, kecuali dalam hal diperlukan untuk kepentingan hukum atau pengembangan sistem yang lebih baik.</p>
+            <p><strong>Keamanan Data</strong> Kami menerapkan standar keamanan tinggi untuk melindungi data pengguna dari akses yang tidak sah, manipulasi, atau penyalahgunaan.</p>
+            <p>Dengan menggunakan layanan ini, pengguna dianggap telah menyetujui kebijakan privasi yang berlaku. Kami dapat memperbarui kebijakan ini sesuai dengan perkembangan teknologi dan regulasi yang berlaku.</p>
+        </div>
+        <div class="popup" id="termsPopup">
+            <span class="popup-close" onclick="hidePopup()">×</span>
+            <h3>Syarat dan Ketentuan</h3>
+            <p><strong>Penerimaan Syarat</strong> Dengan mengakses dan menggunakan layanan WebGIS ini, pengguna dianggap telah membaca, memahami, dan menyetujui syarat dan ketentuan yang berlaku.</p>
+            <p><strong>Penggunaan Layanan</strong> WebGIS ini disediakan untuk tujuan informasi dan analisis. Pengguna dilarang menggunakan data dan informasi yang tersedia untuk tindakan yang melanggar hukum atau merugikan pihak lain.</p>
+            <p><strong>Hak Cipta dan Kepemilikan Data</strong> Semua data, peta, dan informasi yang tersedia dalam sistem ini dilindungi oleh hak cipta dan hanya boleh digunakan sesuai dengan peraturan yang berlaku. Pengguna tidak diperkenankan menyebarluaskan, memodifikasi, atau menggunakan data tanpa izin dari pihak yang berwenang.</p>
+            <p><strong>Keakuratan Data</strong> Kami berusaha menyediakan informasi yang akurat dan terkini, namun tidak menjamin bahwa semua data dalam WebGIS ini bebas dari kesalahan atau kekeliruan. Pengguna diharapkan melakukan verifikasi tambahan sebelum mengambil keputusan berdasarkan informasi yang tersedia.</p>
+            <p><strong>Keamanan dan Privasi</strong> Kami berkomitmen untuk menjaga keamanan data pengguna. Namun, pengguna juga bertanggung jawab untuk menjaga kerahasiaan informasi akun mereka dan tidak menyalahgunakan akses terhadap sistem.</p>
+            <p><strong>Perubahan Syarat dan Ketentuan</strong> Syarat dan ketentuan ini dapat diperbarui sewaktu-waktu sesuai dengan perkembangan layanan dan kebijakan yang berlaku. Pengguna disarankan untuk memeriksa halaman ini secara berkala.</p>
+        </div>
+        <div class="popup" id="faqPopup">
+            <span class="popup-close" onclick="hidePopup()">×</span>
+            <h3>FAQ</h3>
+            <p>1. Apa itu WebGIS? WebGIS adalah sistem informasi geografis berbasis web yang memungkinkan pengguna mengakses, menganalisis, dan memvisualisasikan data spasial secara interaktif melalui internet.</p>
+            <p>2. Bagaimana cara menggunakan WebGIS ini? Pengguna dapat menjelajahi peta interaktif, mencari lokasi spesifik, melihat informasi terkait zona dan wilayah, serta menggunakan berbagai fitur analisis yang tersedia.</p>
+            <p>3. Apakah data dalam WebGIS ini selalu diperbarui? Kami berusaha untuk memperbarui data secara berkala sesuai dengan sumber resmi dan pemutakhiran dari instansi terkait. Namun, jika Anda menemukan data yang perlu diperbaiki, silakan hubungi kami.</p>
+            <p>4. Bisakah saya mengunduh peta dari WebGIS ini? Beberapa data dan peta dapat diunduh sesuai dengan kebijakan yang berlaku. Pastikan untuk memeriksa ketentuan penggunaan sebelum mengunduh atau menyebarluaskan data.</p>
+            <p>5. Apakah WebGIS ini gratis untuk digunakan? Sebagian besar fitur dapat digunakan secara gratis. Namun, beberapa layanan tambahan atau data spesifik mungkin memerlukan izin atau akses khusus.</p>
+            <p>6. Bagaimana cara menghubungi tim pengelola WebGIS? Anda dapat menghubungi kami melalui halaman kontak yang tersedia atau melalui email resmi yang telah disediakan dalam situs.</p>
+        </div>
+
+    <script>
+        // Anda dapat menambahkan logika untuk mengambil data dari URL parameter (misalnya ?layer=land_database&attributes=owner,name,area)
+        const urlParams = new URLSearchParams(window.location.search);
+        const layer = urlParams.get('layer');
+        const attributes = urlParams.get('attributes')?.split(',');
+
+        if (layer && attributes) {
+            console.log(`Layer: ${layer}, Attributes: ${attributes.join(', ')}`);
+            // Logika untuk mengisi tabel dapat ditambahkan di sini, misalnya dengan fetch API ke backend
+        }
+
+        function showPopup(type) {
+            if (type === 'privacy') {
+                document.getElementById('privacyPopup').style.display = 'block';
+            } else if (type === 'terms') {
+                document.getElementById('termsPopup').style.display = 'block';
+            } else if (type === 'faq') {
+                document.getElementById('faqPopup').style.display = 'block';
+            }
+            document.getElementById('popupOverlay').style.display = 'block';
+        }
+
+        function hidePopup() {
+            document.getElementById('privacyPopup').style.display = 'none';
+            document.getElementById('termsPopup').style.display = 'none';
+            document.getElementById('faqPopup').style.display = 'none';
+            document.getElementById('popupOverlay').style.display = 'none';
+        }
+    </script>
+
+    <video autoplay muted loop id="backgroundVideo" style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; z-index: -1;">
+        <source src="Vidio/Animasi.mp4.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</body>
+</html>
