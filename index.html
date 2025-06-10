@@ -13,7 +13,7 @@
         <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
         
         <style>
-        /* Base styles from index.html */
+        /* Gaya dasar HTML dan Body dari desain modern */
         html, body {
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             font-family: 'Inter', sans-serif;
@@ -21,7 +21,7 @@
             padding: 0;
         }
 
-        /* Modern Control Panel Base Styles from index.html */
+        /* Gaya Panel Kontrol Modern */
         .modern-panel {
             position: fixed;
             z-index: 2000;
@@ -35,7 +35,7 @@
             max-width: 384px;
         }
 
-        /* Layer Control Panel */
+        /* Panel Kontrol Layer */
         .layer-control-panel {
             top: 24px;
             left: 24px;
@@ -45,7 +45,7 @@
             transform: translateX(calc(-100% + 48px));
         }
 
-        /* Legend Panel */
+        /* Panel Legenda */
         .legend-panel {
             top: 24px;
             right: 24px;
@@ -55,7 +55,7 @@
             transform: translateX(calc(100% - 48px));
         }
 
-        /* Map Info Panel */
+        /* Panel Informasi Peta */
         .map-info-panel {
             top: auto;
             bottom: 24px;
@@ -67,7 +67,7 @@
             transform: translateX(calc(100% - 48px));
         }
 
-        /* Panel Headers */
+        /* Header Panel */
         .panel-header {
             display: flex;
             align-items: center;
@@ -80,7 +80,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-        }
+    }
 
         .panel-icon {
             padding: 8px;
@@ -129,17 +129,17 @@
             color: #1e293b;
         }
 
-        /* Toggle button when collapsed */
+        /* Tombol Toggle saat panel dilipat */
         .collapsed .panel-toggle {
             position: absolute;
-            right: -48px; /* Increased for better click area */
+            right: -48px; /* Diperbesar untuk area klik yang lebih baik */
             top: 50%;
             transform: translateY(-50%);
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 3100; /* Higher z-index to ensure clickability */
+            z-index: 3100; /* Z-index lebih tinggi agar dapat diklik */
             width: 40px;
             height: 40px;
             cursor: pointer;
@@ -148,23 +148,23 @@
 
         .legend-panel.collapsed .panel-toggle,
         .map-info-panel.collapsed .panel-toggle {
-            left: -48px; /* Adjusted for legend and info panels */
+            left: -48px; /* Disesuaikan untuk panel legenda dan info */
             right: auto;
         }
 
-        /* Ensure panels don’t interfere with clicks when collapsed */
+        /* Memastikan panel tidak mengganggu klik saat dilipat */
         .modern-panel.collapsed {
-            overflow: visible; /* Allow toggle button to be accessible */
+            overflow: visible; /* Memungkinkan tombol toggle dapat diakses */
         }
 
-        /* Hover effect for better feedback */
+        /* Efek Hover untuk umpan balik yang lebih baik */
         .panel-toggle:hover {
             background: #f1f5f9;
             color: #1e293b;
-            transform: translateY(-50%) scale(1.05); /* Slight scale for feedback */
+            transform: translateY(-50%) scale(1.05); /* Sedikit skala untuk umpan balik */
         }
 
-        /* Panel Content */
+        /* Konten Panel */
         .panel-content {
             padding: 24px;
             transition: all 0.3s ease;
@@ -174,7 +174,7 @@
             display: none;
         }
 
-        /* Section Styles */
+        /* Gaya Bagian */
         .section-label {
             display: flex;
             align-items: center;
@@ -197,7 +197,7 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
-        /* Basemap Selector */
+        /* Pemilih Peta Dasar */
         .basemap-section {
             margin-bottom: 24px;
         }
@@ -221,7 +221,7 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        /* Layer Items */
+        /* Item Layer */
         .layer-section {
             margin-bottom: 24px;
         }
@@ -302,7 +302,7 @@
             background: #cbd5e1;
         }
 
-        /* Opacity Controls */
+        /* Kontrol Opasitas */
         .opacity-control {
             display: flex;
             align-items: center;
@@ -353,7 +353,7 @@
             min-width: 35px;
         }
 
-        /* Legend Items */
+        /* Item Legenda */
         .legend-list {
             display: flex;
             flex-direction: column;
@@ -421,7 +421,7 @@
             background: #cbd5e1;
         }
 
-        /* Info Panel */
+        /* Panel Info */
         .info-content {
             display: flex;
             flex-direction: column;
@@ -445,7 +445,7 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Custom Scrollbar */
+        /* Scrollbar Kustom */
         .layer-list::-webkit-scrollbar,
         .legend-list::-webkit-scrollbar {
             width: 6px;
@@ -468,7 +468,7 @@
             background: #94a3b8;
         }
 
-        /* Responsive Design */
+        /* Desain Responsif */
         @media (max-width: 768px) {
             .layer-control-panel,
             .legend-panel,
@@ -484,7 +484,7 @@
             
             .legend-panel {
                 top: auto;
-                bottom: 100px; /* Adjust to leave space for info panel */
+                bottom: 100px; /* Sesuaikan untuk menyisakan ruang bagi panel info */
             }
             
             .map-info-panel {
@@ -493,11 +493,11 @@
             }
             
             .collapsed .panel-toggle {
-                z-index: 3100; /* High z-index for mobile clickability */
+                z-index: 3100; /* Z-index tinggi untuk kemampuan klik pada perangkat seluler */
             }
         }
         
-        /* Default OpenLayers Control Styles (simplified from index (1).html, if needed) */
+        /* Gaya Kontrol OpenLayers default */
         .ol-control > * {
             background-color: rgba(255, 255, 255, 0.9)!important;
             color: #1e293b!important;
@@ -739,16 +739,16 @@
         <script src="./resources/qgis2web.js"></script>
 
         <script>
-        // Initialize Lucide icons
+        // Inisialisasi ikon Lucide saat DOM dimuat
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
         });
 
-        // Wait for map to be initialized
+        // Menunggu inisialisasi objek peta OpenLayers
         let mapInitialized = false;
         let layerReferences = {};
 
-        // Layer state management
+        // Status visibilitas dan opasitas layer
         const layerState = {
             bidangTanah: { visible: true, opacity: 100 },
             hak: { visible: true, opacity: 100 },
@@ -756,19 +756,22 @@
             znt: { visible: true, opacity: 100 }
         };
 
-        // Function to wait for map initialization
+        // Fungsi untuk menunggu objek peta OpenLayers tersedia
         function waitForMap() {
+            // Periksa apakah 'map' didefinisikan secara global oleh skrip OpenLayers/QGIS2Web
             if (typeof map !== 'undefined' && map && typeof map.on === 'function') {
                 mapInitialized = true;
-                setupLayerReferences();
-                initializeModernControls();
+                setupLayerReferences(); // Inisialisasi referensi layer OpenLayers
+                initializeModernControls(); // Inisialisasi kontrol panel kustom
             } else {
+                // Coba lagi setelah penundaan singkat jika peta belum siap
                 setTimeout(waitForMap, 100);
             }
         }
 
-        // Setup layer references
+        // Mengatur referensi ke objek layer OpenLayers yang sebenarnya
         function setupLayerReferences() {
+            // Pastikan variabel layer global ada sebelum merujuknya
             if (typeof lyr_BidangTanah_Bawu_1 !== 'undefined') {
                 layerReferences.bidangTanah = lyr_BidangTanah_Bawu_1;
             }
@@ -783,31 +786,18 @@
             }
         }
 
-        // Initialize modern controls
+        // Fungsi utama untuk menginisialisasi semua kontrol kustom
         function initializeModernControls() {
-            // Panel toggles
-            setupPanelToggles();
-            
-            // Basemap switching
-            setupBasemapControl();
-            
-            // Layer visibility controls
-            setupLayerVisibilityControls();
-            
-            // Opacity controls
-            setupOpacityControls();
-            
-            // Legend controls
-            setupLegendControls();
-            
-            // Coordinate tracking
-            setupCoordinateTracking();
-            
-            // Scale tracking
-            setupScaleTracking();
+            setupPanelToggles(); // Mengatur fungsi buka/tutup panel
+            setupBasemapControl(); // Mengatur kontrol peta dasar
+            setupLayerVisibilityControls(); // Mengatur kontrol visibilitas layer (ikon mata)
+            setupOpacityControls(); // Mengatur kontrol opasitas layer
+            setupLegendControls(); // Mengatur kontrol legenda (juga ikon mata)
+            setupCoordinateTracking(); // Mengatur pelacakan koordinat mouse
+            setupScaleTracking(); // Mengatur pelacakan skala peta
         }
 
-        // Setup panel toggles
+        // Mengatur fungsionalitas buka/tutup untuk panel samping
         function setupPanelToggles() {
             const layerControlPanel = document.getElementById('layerControlPanel');
             const layerControlToggle = document.getElementById('layerControlToggle');
@@ -816,142 +806,119 @@
             const mapInfoPanel = document.getElementById('mapInfoPanel');
             const mapInfoToggle = document.getElementById('mapInfoToggle');
 
-            // Layer Control Panel Toggle
+            // Toggle Panel Kontrol Layer
             if (layerControlToggle && layerControlPanel) {
                 layerControlToggle.onclick = function() {
                     layerControlPanel.classList.toggle('collapsed');
                     const icon = this.querySelector('i');
-                    
                     if (layerControlPanel.classList.contains('collapsed')) {
                         icon.setAttribute('data-lucide', 'chevron-right');
                     } else {
                         icon.setAttribute('data-lucide', 'chevron-left');
                     }
-                    
-                    lucide.createIcons();
+                    lucide.createIcons(); // Perbarui ikon
                 };
             }
 
-            // Legend Panel Toggle
+            // Toggle Panel Legenda
             if (legendToggle && legendPanel) {
                 legendToggle.onclick = function() {
                     legendPanel.classList.toggle('collapsed');
                     const icon = this.querySelector('i');
-                    
                     if (legendPanel.classList.contains('collapsed')) {
                         icon.setAttribute('data-lucide', 'chevron-left');
                     } else {
                         icon.setAttribute('data-lucide', 'chevron-right');
                     }
-                    
-                    lucide.createIcons();
+                    lucide.createIcons(); // Perbarui ikon
                 };
             }
 
-            // Map Info Panel Toggle
+            // Toggle Panel Informasi Peta
             if (mapInfoToggle && mapInfoPanel) {
                 mapInfoToggle.onclick = function() {
                     mapInfoPanel.classList.toggle('collapsed');
                     const icon = this.querySelector('i');
-                    
                     if (mapInfoPanel.classList.contains('collapsed')) {
                         icon.setAttribute('data-lucide', 'chevron-left');
                     } else {
                         icon.setAttribute('data-lucide', 'chevron-right');
                     }
-                    
-                    lucide.createIcons();
+                    lucide.createIcons(); // Perbarui ikon
                 };
             }
         }
 
-        // Setup basemap control
+        // Mengatur kontrol pemilihan peta dasar
         function setupBasemapControl() {
             const basemapSelect = document.getElementById('basemapSelect');
-            if (basemapSelect) { // Added check for basemapSelect
+            if (basemapSelect) {
                 basemapSelect.addEventListener('change', function() {
                     switchBasemap(this.value);
                 });
             }
         }
 
-        // Setup layer visibility controls
+        // Mengatur kontrol visibilitas layer (ikon mata di panel kontrol)
         function setupLayerVisibilityControls() {
             const visibilityToggles = document.querySelectorAll('.visibility-toggle');
-            
             visibilityToggles.forEach(toggle => {
                 toggle.addEventListener('click', function(e) {
                     e.preventDefault();
-                    e.stopPropagation();
+                    e.stopPropagation(); // Mencegah event bubbling
                     const layerKey = this.getAttribute('data-layer');
                     if (layerKey && layerState[layerKey]) {
                         const isVisible = !layerState[layerKey].visible;
-                        
-                        // Toggle visibility
-                        layerState[layerKey].visible = isVisible;
-                        toggleLayerVisibility(layerKey, isVisible);
-                        
-                        // Update button appearance
-                        updateVisibilityButton(this, isVisible);
-                        
-                        // Sync with legend
-                        syncLegendToggle(layerKey, isVisible);
+                        layerState[layerKey].visible = isVisible; // Perbarui status internal
+                        toggleLayerVisibility(layerKey, isVisible); // Perbarui visibilitas layer peta
+
+                        updateVisibilityButton(this, isVisible); // Perbarui tampilan tombol (ikon mata)
+                        syncLegendToggle(layerKey, isVisible); // Sinkronkan dengan legenda
                     }
                 });
             });
         }
 
-        // Setup opacity controls
+        // Mengatur kontrol opasitas layer (slider)
         function setupOpacityControls() {
             const opacitySliders = document.querySelectorAll('.opacity-slider');
-            
             opacitySliders.forEach(slider => {
                 slider.addEventListener('input', function() {
                     const layerKey = this.getAttribute('data-layer');
                     const opacity = parseInt(this.value);
-                    
-                    // Update layer opacity
-                    layerState[layerKey].opacity = opacity;
-                    setLayerOpacity(layerKey, opacity / 100);
-                    
-                    // Update display value
+                    layerState[layerKey].opacity = opacity; // Perbarui status internal
+                    setLayerOpacity(layerKey, opacity / 100); // Perbarui opasitas layer peta
+
                     const valueDisplay = this.parentElement.querySelector('.opacity-value');
-                    valueDisplay.textContent = opacity + '%';
+                    valueDisplay.textContent = opacity + '%'; // Perbarui nilai tampilan
                 });
             });
         }
 
-        // Setup legend controls
+        // Mengatur kontrol legenda (ikon mata di panel legenda)
         function setupLegendControls() {
             const legendToggles = document.querySelectorAll('.legend-toggle');
-            
             legendToggles.forEach(toggle => {
                 toggle.addEventListener('click', function(e) {
                     e.preventDefault();
-                    e.stopPropagation();
+                    e.stopPropagation(); // Mencegah event bubbling
                     const legendItem = this.closest('.legend-item');
                     const layerKey = legendItem.getAttribute('data-layer');
-                    
                     if (layerKey && layerState[layerKey]) {
                         const isVisible = !layerState[layerKey].visible;
-                        
-                        // Toggle visibility
-                        layerState[layerKey].visible = isVisible;
-                        toggleLayerVisibility(layerKey, isVisible);
-                        
-                        // Update legend button
-                        updateLegendButton(this, isVisible);
-                        
-                        // Sync with layer control
-                        syncVisibilityToggle(layerKey, isVisible);
+                        layerState[layerKey].visible = isVisible; // Perbarui status internal
+                        toggleLayerVisibility(layerKey, isVisible); // Perbarui visibilitas layer peta
+
+                        updateLegendButton(this, isVisible); // Perbarui tampilan tombol (ikon mata)
+                        syncVisibilityToggle(layerKey, isVisible); // Sinkronkan dengan panel kontrol
                     }
                 });
             });
         }
 
-        // Setup coordinate tracking
+        // Mengatur pelacakan koordinat mouse di peta
         function setupCoordinateTracking() {
-            if (mapInitialized && map && typeof map.on === 'function') { // Added mapInitialized check
+            if (mapInitialized && map && typeof map.on === 'function') {
                 map.on('pointermove', function(evt) {
                     const coordinate = ol.proj.toLonLat(evt.coordinate);
                     const coords = coordinate[1].toFixed(6) + '°, ' + coordinate[0].toFixed(6) + '°';
@@ -963,13 +930,13 @@
             }
         }
 
-        // Setup scale tracking
+        // Mengatur pelacakan skala peta
         function setupScaleTracking() {
-            if (mapInitialized && map && typeof map.getView === 'function') { // Added mapInitialized check
+            if (mapInitialized && map && typeof map.getView === 'function') {
                 map.getView().on('change:resolution', function() {
                     const resolution = map.getView().getResolution();
                     const units = map.getView().getProjection().getUnits();
-                    const dpi = 25.4 / 0.28;
+                    const dpi = 25.4 / 0.28; // Standard DPI for screen
                     const mpu = ol.proj.METERS_PER_UNIT[units];
                     const scale = resolution * mpu * 39.37 * dpi;
                     const scaleElement = document.getElementById('mapScale');
@@ -980,52 +947,56 @@
             }
         }
 
-        // Helper functions
+        // Fungsi pembantu: Memperbarui tampilan tombol visibilitas (ikon mata)
         function updateVisibilityButton(button, isVisible) {
             const icon = button.querySelector('i');
             if (icon) {
                 button.classList.remove('visible', 'hidden');
                 button.classList.add(isVisible ? 'visible' : 'hidden');
                 icon.setAttribute('data-lucide', isVisible ? 'eye' : 'eye-off');
-                lucide.createIcons();
+                lucide.createIcons(); // Penting: render ulang ikon setelah perubahan atribut
             }
         }
 
+        // Fungsi pembantu: Memperbarui tampilan tombol legenda (ikon mata)
         function updateLegendButton(button, isVisible) {
             const icon = button.querySelector('i');
             if (icon) {
                 button.classList.remove('visible', 'hidden');
                 button.classList.add(isVisible ? 'visible' : 'hidden');
                 icon.setAttribute('data-lucide', isVisible ? 'eye' : 'eye-off');
-                lucide.createIcons();
+                lucide.createIcons(); // Penting: render ulang ikon setelah perubahan atribut
             }
         }
 
+        // Fungsi pembantu: Sinkronkan tombol legenda dengan kontrol layer
         function syncLegendToggle(layerKey, isVisible) {
             const legendItem = document.querySelector(`.legend-item[data-layer="${layerKey}"]`);
             if (legendItem) {
                 const legendToggle = legendItem.querySelector('.legend-toggle');
-                if (legendToggle) { // Added check for legendToggle
+                if (legendToggle) {
                     updateLegendButton(legendToggle, isVisible);
                 }
             }
         }
 
+        // Fungsi pembantu: Sinkronkan tombol kontrol layer dengan legenda
         function syncVisibilityToggle(layerKey, isVisible) {
             const visibilityToggle = document.querySelector(`.visibility-toggle[data-layer="${layerKey}"]`);
-            if (visibilityToggle) { // Added check for visibilityToggle
+            if (visibilityToggle) {
                 updateVisibilityButton(visibilityToggle, isVisible);
             }
         }
 
-        // Basemap switching function
+        // Fungsi untuk mengganti peta dasar
         function switchBasemap(basemapType) {
-            if (!mapInitialized || !map || typeof map.getLayers !== 'function') { // Added mapInitialized check
+            if (!mapInitialized || !map || typeof map.getLayers !== 'function') {
                 return;
             }
             
             const layers = map.getLayers().getArray();
-            const baseLayer = layers[0];
+            // Asumsikan layer pertama adalah basemap
+            let baseLayer = layers[0]; 
             
             let newBaseLayer;
             
@@ -1054,37 +1025,40 @@
                         })
                     });
                     break;
-                default:
+                default: // osm
                     newBaseLayer = new ol.layer.Tile({
                         source: new ol.source.OSM()
                     });
             }
             
+            // Ganti basemap di posisi pertama
             map.getLayers().setAt(0, newBaseLayer);
         }
 
-        // Layer control functions
+        // Fungsi untuk mengubah visibilitas layer OpenLayers
         function toggleLayerVisibility(layerKey, visible) {
             const layer = layerReferences[layerKey];
-            if (layer && typeof layer.setVisible === 'function') { // Added typeof check
+            if (layer && typeof layer.setVisible === 'function') {
                 layer.setVisible(visible);
             }
         }
 
+        // Fungsi untuk mengatur opasitas layer OpenLayers
         function setLayerOpacity(layerKey, opacity) {
             const layer = layerReferences[layerKey];
-            if (layer && typeof layer.setOpacity === 'function') { // Added typeof check
+            if (layer && typeof layer.setOpacity === 'function') {
                 layer.setOpacity(opacity);
             }
         }
 
-        // Responsive behavior
+        // Perilaku responsif untuk panel saat ukuran jendela diubah
         window.addEventListener('resize', function() {
             if (window.innerWidth <= 768) {
                 const legendPanel = document.getElementById('legendPanel');
                 const layerControlPanel = document.getElementById('layerControlPanel');
                 const mapInfoPanel = document.getElementById('mapInfoPanel');
                 
+                // Lipat panel saat di layar kecil jika tidak dilipat
                 if (legendPanel && !legendPanel.classList.contains('collapsed')) {
                     legendPanel.classList.add('collapsed');
                     const legendToggle = document.getElementById('legendToggle');
@@ -1111,11 +1085,7 @@
             }
         });
 
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            waitForMap();
-        });
-
+        // Panggil waitForMap() saat DOM siap, atau segera jika sudah siap
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', waitForMap);
         } else {
